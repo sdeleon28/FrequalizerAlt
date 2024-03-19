@@ -4,7 +4,7 @@
 [X] Change plugin name to Frequalizer Alt
 [X] Stash the changes that I have
 [X] Can I run it? -> Yes
-[-] Fix q jump interval
+[X] Fix q jump interval
 [ ] Fix solo
     [ ] git stash pop
     [ ] It should be possible to set a band as solo as a param
