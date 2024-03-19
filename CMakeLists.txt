@@ -28,11 +28,12 @@ juce_add_plugin(frequalizer
                 VST3_CATEGORIES "Fx" "Analyzer" "EQ"
                 AAX_CATEGORY "AAX_ePlugInCategory_EQ"
                 AU_MAIN_TYPE "kAudioUnitType_Effect"
+                COPY_PLUGIN_AFTER_BUILD TRUE
                 COMPANY_WEBSITE "https://foleysfinest.com"
                 COMPANY_EMAIL "info@foleysfinest.com"
                 BUNDLE_ID "com.foleysfinest.frequalizer"
-                PLUGIN_NAME "Frequalizer Free"
-                PRODUCT_NAME "Frequalizer")
+                PLUGIN_NAME "Frequalizer Alt"
+                PRODUCT_NAME "Frequalizer Alt")
 
 # add the sources
 add_subdirectory(Resources)
