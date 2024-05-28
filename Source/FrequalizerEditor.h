@@ -12,13 +12,12 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_opengl/juce_opengl.h>
 
-
 //==============================================================================
 /**
-*/
-class FrequalizerAudioProcessorEditor  : public juce::AudioProcessorEditor,
-                                         public juce::ChangeListener,
-                                         public juce::Timer
+ */
+class FrequalizerAudioProcessorEditor : public juce::AudioProcessorEditor,
+                                        public juce::ChangeListener,
+                                        public juce::Timer
 {
 public:
     FrequalizerAudioProcessorEditor (FrequalizerAudioProcessor&);
@@ -40,13 +39,12 @@ public:
 
     //==============================================================================
 
-    class BandEditor : public juce::Component,
-                       public juce::Button::Listener
+    class BandEditor : public juce::Component, public juce::Button::Listener
     {
     public:
         BandEditor (size_t i, FrequalizerAudioProcessor& processor);
 
-        void resized () override;
+        void resized() override;
 
         void updateControls (FrequalizerAudioProcessor::FilterType type);
 
@@ -61,27 +59,33 @@ public:
         void buttonClicked (juce::Button* b) override;
 
         juce::Path frequencyResponse;
+
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandEditor)
 
         size_t index;
         FrequalizerAudioProcessor& processor;
 
-        juce::GroupComponent      frame;
-        juce::ComboBox            filterType;
-        juce::Slider              frequency { juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::TextBoxBelow };
-        juce::Slider              quality   { juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::TextBoxBelow };
-        juce::Slider              gain      { juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::TextBoxBelow };
-        juce::TextButton          solo      { TRANS ("S") };
-        juce::TextButton          activate  { TRANS ("A") };
-        juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment> boxAttachments;
-        juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> attachments;
-        juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment> buttonAttachments;
+        juce::GroupComponent frame;
+        juce::ComboBox filterType;
+        juce::Slider frequency { juce::Slider::RotaryHorizontalVerticalDrag,
+                                 juce::Slider::TextBoxBelow };
+        juce::Slider quality { juce::Slider::RotaryHorizontalVerticalDrag,
+                               juce::Slider::TextBoxBelow };
+        juce::Slider gain { juce::Slider::RotaryHorizontalVerticalDrag,
+                            juce::Slider::TextBoxBelow };
+        juce::TextButton solo { TRANS ("S") };
+        juce::TextButton activate { TRANS ("A") };
+        juce::OwnedArray<juce::AudioProcessorValueTreeState::ComboBoxAttachment>
+            boxAttachments;
+        juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment>
+            attachments;
+        juce::OwnedArray<juce::AudioProcessorValueTreeState::ButtonAttachment>
+            buttonAttachments;
     };
 
 private:
-
-    void updateFrequencyResponses ();
+    void updateFrequencyResponses();
 
     static float getPositionForFrequency (float freq);
 
@@ -95,30 +99,33 @@ private:
     // access the processor object that created it.
     FrequalizerAudioProcessor& freqProcessor;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrequalizerAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
+        FrequalizerAudioProcessorEditor)
 
 #ifdef JUCE_OPENGL
-    juce::OpenGLContext     openGLContext;
+    juce::OpenGLContext openGLContext;
 #endif
 
-    juce::OwnedArray<BandEditor>  bandEditors;
+    juce::OwnedArray<BandEditor> bandEditors;
 
-    juce::Rectangle<int>          plotFrame;
-    juce::Rectangle<int>          brandingFrame;
+    juce::Rectangle<int> plotFrame;
+    juce::Rectangle<int> brandingFrame;
 
-    juce::Path                    frequencyResponse;
-    juce::Path                    analyserPath;
+    juce::Path frequencyResponse;
+    juce::Path analyserPath;
 
-    juce::GroupComponent          frame;
-    juce::Slider                  output { juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::TextBoxBelow };
+    juce::GroupComponent frame;
+    juce::Slider output { juce::Slider::RotaryHorizontalVerticalDrag,
+                          juce::Slider::TextBoxBelow };
 
-    SocialButtons                 socialButtons;
+    SocialButtons socialButtons;
 
-    int                           draggingBand = -1;
-    bool                          draggingGain = false;
+    int draggingBand = -1;
+    bool draggingGain = false;
 
-    juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment> attachments;
+    juce::OwnedArray<juce::AudioProcessorValueTreeState::SliderAttachment>
+        attachments;
     juce::SharedResourcePointer<juce::TooltipWindow> tooltipWindow;
 
-    juce::PopupMenu               contextMenu;
+    juce::PopupMenu contextMenu;
 };

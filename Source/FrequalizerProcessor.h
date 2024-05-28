@@ -16,10 +16,11 @@ using namespace juce;
 
 //==============================================================================
 /**
-*/
-class FrequalizerAudioProcessor  : public juce::AudioProcessor,
-                                   public juce::AudioProcessorValueTreeState::Listener,
-                                   public juce::ChangeBroadcaster
+ */
+class FrequalizerAudioProcessor
+    : public juce::AudioProcessor,
+      public juce::AudioProcessorValueTreeState::Listener,
+      public juce::ChangeBroadcaster
 {
 public:
     enum FilterType
@@ -61,19 +62,20 @@ public:
     void prepareToPlay (double newSampleRate, int newSamplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
+#ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+#endif
 
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
-    void parameterChanged (const juce::String& parameter, float newValue) override;
+    void parameterChanged (const juce::String& parameter,
+                           float newValue) override;
 
     juce::AudioProcessorValueTreeState& getPluginState();
 
-    size_t getNumBands () const;
+    size_t getNumBands() const;
 
-    juce::String getBandName   (size_t index) const;
+    juce::String getBandName (size_t index) const;
     juce::Colour getBandColour (size_t index) const;
 
     void setBandSolo (int index);
@@ -85,11 +87,17 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
-    const std::vector<double>& getMagnitudes ();
+    const std::vector<double>& getMagnitudes();
 
-    void createFrequencyPlot (juce::Path& p, const std::vector<double>& mags, const juce::Rectangle<int> bounds, float pixelsPerDouble);
+    void createFrequencyPlot (juce::Path& p,
+                              const std::vector<double>& mags,
+                              const juce::Rectangle<int> bounds,
+                              float pixelsPerDouble);
 
-    void createAnalyserPlot (juce::Path& p, const juce::Rectangle<int> bounds, float minFreq, bool input);
+    void createAnalyserPlot (juce::Path& p,
+                             const juce::Rectangle<int> bounds,
+                             float minFreq,
+                             bool input);
 
     bool checkForNewAnalyserData();
 
@@ -115,25 +123,32 @@ public:
     void setSavedSize (const juce::Point<int>& size);
 
     //==============================================================================
-    struct Band {
-        Band (const juce::String& nameToUse, juce::Colour colourToUse, FilterType typeToUse,
-            float frequencyToUse, float qualityToUse, float gainToUse=1.0f, bool shouldBeActive=true)
-          : name (nameToUse),
-            colour (colourToUse),
-            type (typeToUse),
-            frequency (frequencyToUse),
-            quality (qualityToUse),
-            gain (gainToUse),
-            active (shouldBeActive)
-        {}
+    struct Band
+    {
+        Band (const juce::String& nameToUse,
+              juce::Colour colourToUse,
+              FilterType typeToUse,
+              float frequencyToUse,
+              float qualityToUse,
+              float gainToUse = 1.0f,
+              bool shouldBeActive = true)
+            : name (nameToUse),
+              colour (colourToUse),
+              type (typeToUse),
+              frequency (frequencyToUse),
+              quality (qualityToUse),
+              gain (gainToUse),
+              active (shouldBeActive)
+        {
+        }
 
         juce::String name;
         juce::Colour colour;
-        FilterType   type      = BandPass;
-        float        frequency = 1000.0f;
-        float        quality   = 1.0f;
-        float        gain      = 1.0f;
-        bool         active    = true;
+        FilterType type = BandPass;
+        float frequency = 1000.0f;
+        float quality = 1.0f;
+        float gain = 1.0f;
+        bool active = true;
         std::vector<double> magnitudes;
     };
 
@@ -146,23 +161,32 @@ private:
 
     void updateBand (const size_t index);
 
-    void updateBypassedStates ();
+    void updateBypassedStates();
 
-    void updatePlots ();
+    void updatePlots();
 
-    juce::UndoManager                  undo;
+    juce::UndoManager undo;
     juce::AudioProcessorValueTreeState state;
 
-    std::vector<Band>    bands;
+    std::vector<Band> bands;
 
     std::vector<double> frequencies;
     std::vector<double> magnitudes;
 
     bool wasBypassed = true;
 
-    using FilterBand = juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>;
-    using Gain       = juce::dsp::Gain<float>;
-    juce::dsp::ProcessorChain<FilterBand, FilterBand, FilterBand, FilterBand, FilterBand, FilterBand, Gain> filter;
+    using FilterBand =
+        juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>,
+                                       juce::dsp::IIR::Coefficients<float>>;
+    using Gain = juce::dsp::Gain<float>;
+    juce::dsp::ProcessorChain<FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              Gain>
+        filter;
 
     double sampleRate = 0;
 
