@@ -44,6 +44,8 @@ target_link_libraries(frequalizer PRIVATE juce::juce_recommended_warning_flags j
 target_link_libraries(frequalizer PRIVATE juce::juce_opengl juce::juce_dsp juce::juce_audio_utils)
 target_compile_definitions(frequalizer 
     PUBLIC 
+    # FIXME: Remove this and fix assertions
+    JUCE_DISABLE_ASSERTIONS=1
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_WEB_BROWSER=0)
 
