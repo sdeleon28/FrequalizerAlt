@@ -1,9 +1,32 @@
 # Roadmap
 
+## Q jump fix
+
 [X] Check out a branch -> solo-param
 [X] Change plugin name to Frequalizer Alt
 [X] Stash the changes that I have
 [X] Can I run it? -> Yes
 [X] Fix q jump interval
 [X] Undo everything about solo
-[ ] Create release build
+
+## Mid/Side UI
+
+[ ] Write state machine
+    [ ] Stereo
+    [ ] Mid
+    [ ] Side
+    [ ] MidSolo
+    [ ] SideSolo
+[ ] Implement UI
+    [ ] Show empty rectangle
+    [ ] Hardcoded buttons
+        [ ] Stereo + Mid/Side
+        [ ] Mid + Side
+        [ ] Solo + Solo
+    [ ] Connect UI to state machine
+        [ ] Make each button dispatch the right transition
+        [ ] Map states to element visibility and on/off state
+
+## Cleanup
+
+[ ] Remove JUCE_DISABLE_ASSERTIONS=1 from CMakeLists.txt
