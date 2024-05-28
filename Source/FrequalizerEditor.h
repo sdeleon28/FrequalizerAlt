@@ -107,6 +107,7 @@ private:
 #endif
 
     juce::OwnedArray<BandEditor> bandEditors;
+    std::vector<BandEditor*> activeBandEditors;
 
     juce::Rectangle<int> plotFrame;
     juce::Rectangle<int> brandingFrame;
@@ -118,7 +119,7 @@ private:
     juce::Slider output { juce::Slider::RotaryHorizontalVerticalDrag,
                           juce::Slider::TextBoxBelow };
 
-    SocialButtons socialButtons;
+    /* SocialButtons socialButtons; */
 
     int draggingBand = -1;
     bool draggingGain = false;

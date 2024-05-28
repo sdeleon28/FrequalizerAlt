@@ -21,7 +21,7 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
 {
     tooltipWindow->setMillisecondsBeforeTipAppears (1000);
 
-    addAndMakeVisible (socialButtons);
+    /* addAndMakeVisible (socialButtons); */
 
     for (size_t i = 0; i < freqProcessor.getNumBands(); ++i)
     {
@@ -165,10 +165,18 @@ void FrequalizerAudioProcessorEditor::paint (juce::Graphics& g)
         "Output", plotFrame.reduced (8, 28), juce::Justification::topRight, 1);
     g.strokePath (analyserPath, juce::PathStrokeType (1.0));
 
+#ifdef MID_SIDE_ON
+    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
+#else
+    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+#endif
     for (size_t i = 0; i < freqProcessor.getNumBands(); ++i)
     {
-        auto* bandEditor = bandEditors.getUnchecked (int (i));
         auto* band = freqProcessor.getBand (i);
+        if (band->mode != activeMode)
+            continue;
+
+        auto* bandEditor = bandEditors.getUnchecked (int (i));
 
         g.setColour (band->active ? band->colour
                                   : band->colour.withAlpha (0.3f));
@@ -197,12 +205,30 @@ void FrequalizerAudioProcessorEditor::resized()
     freqProcessor.setSavedSize ({ getWidth(), getHeight() });
     plotFrame = getLocalBounds().reduced (3, 3);
 
-    socialButtons.setBounds (plotFrame.removeFromBottom (35));
+    /* socialButtons.setBounds (plotFrame.removeFromBottom (35)); */
 
     auto bandSpace = plotFrame.removeFromBottom (getHeight() / 2);
+
+#define MID_SIDE_ON 1
+#ifdef MID_SIDE_ON
+    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
+#else
+    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+#endif
+
+    activeBandEditors.clear();
+    size_t i = 0;
+    for (auto bandEditor: bandEditors)
+    {
+        auto* band = freqProcessor.getBand (i);
+        if (band->mode == activeMode)
+            activeBandEditors.push_back (bandEditor);
+        i++;
+    }
+
     auto width =
-        juce::roundToInt (bandSpace.getWidth()) / (bandEditors.size() + 1);
-    for (auto* bandEditor : bandEditors)
+        juce::roundToInt (bandSpace.getWidth()) / (activeBandEditors.size() + 1);
+    for (auto* bandEditor : activeBandEditors)
         bandEditor->setBounds (bandSpace.removeFromLeft (width));
 
     frame.setBounds (bandSpace.removeFromTop (bandSpace.getHeight() / 2));

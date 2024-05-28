@@ -40,6 +40,13 @@ public:
         LastFilterID
     };
 
+    enum FilterMode
+    {
+        Normal,
+        Mid,
+        Side,
+    };
+
     static juce::String paramOutput;
     static juce::String paramType;
     static juce::String paramFrequency;
@@ -126,6 +133,7 @@ public:
     struct Band
     {
         Band (const juce::String& nameToUse,
+              FilterMode modeToUse,
               juce::Colour colourToUse,
               FilterType typeToUse,
               float frequencyToUse,
@@ -133,6 +141,7 @@ public:
               float gainToUse = 1.0f,
               bool shouldBeActive = true)
             : name (nameToUse),
+              mode (modeToUse),
               colour (colourToUse),
               type (typeToUse),
               frequency (frequencyToUse),
@@ -143,6 +152,7 @@ public:
         }
 
         juce::String name;
+        FilterMode mode;
         juce::Colour colour;
         FilterType type = BandPass;
         float frequency = 1000.0f;
