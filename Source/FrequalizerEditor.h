@@ -9,8 +9,11 @@
 #pragma once
 
 #include "FrequalizerProcessor.h"
+
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_opengl/juce_opengl.h>
+
+#include "ModeControlsComponent.h"
 
 //==============================================================================
 /**
@@ -129,6 +132,8 @@ private:
     juce::SharedResourcePointer<juce::TooltipWindow> tooltipWindow;
 
     juce::PopupMenu contextMenu;
+
+    ModeControlsComponent modeControlsComponent;
 
     FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
 };

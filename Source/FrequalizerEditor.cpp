@@ -9,7 +9,7 @@
 #include "FrequalizerEditor.h"
 #include "Analyser.h"
 #include "FrequalizerProcessor.h"
-#include "SocialButtons.h"
+// #include "SocialButtons.h"
 
 static int clickRadius = 4;
 static float maxDB = 24.0f;
@@ -17,7 +17,9 @@ static float maxDB = 24.0f;
 //==============================================================================
 FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
     FrequalizerAudioProcessor& p)
-    : juce::AudioProcessorEditor (&p), freqProcessor (p)
+    : juce::AudioProcessorEditor (&p),
+      freqProcessor (p),
+      modeControlsComponent (freqProcessor.getPluginState())
 {
     tooltipWindow->setMillisecondsBeforeTipAppears (1000);
 
@@ -26,7 +28,8 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
     for (size_t i = 0; i < freqProcessor.getNumBands(); ++i)
     {
         auto* bandEditor = bandEditors.add (new BandEditor (i, freqProcessor));
-        addAndMakeVisible (bandEditor);
+        if (freqProcessor.getBand (i)->mode == activeMode)
+            addAndMakeVisible (bandEditor);
     }
 
     frame.setText (TRANS ("Output"));
@@ -52,6 +55,8 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
 
     freqProcessor.addChangeListener (this);
 
+    addAndMakeVisible (modeControlsComponent);
+
     startTimerHz (30);
 }
 
@@ -76,12 +81,14 @@ void FrequalizerAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (
         juce::ResizableWindow::backgroundColourId));
 
-    auto logo = juce::ImageCache::getFromMemory (FFAudioData::LogoFF_png,
-                                                 FFAudioData::LogoFF_pngSize);
-    g.drawImage (
-        logo,
-        brandingFrame.toFloat(),
-        juce::RectanglePlacement (juce::RectanglePlacement::fillDestination));
+    /* auto logo = juce::ImageCache::getFromMemory (FFAudioData::LogoFF_png, */
+    /*                                              FFAudioData::LogoFF_pngSize);
+     */
+    /* g.drawImage ( */
+    /*     logo, */
+    /*     brandingFrame.toFloat(), */
+    /*     juce::RectanglePlacement
+     * (juce::RectanglePlacement::fillDestination)); */
 
     g.setFont (12.0f);
     g.setColour (juce::Colours::silver);
@@ -206,7 +213,7 @@ void FrequalizerAudioProcessorEditor::resized()
 
     activeBandEditors.clear();
     size_t i = 0;
-    for (auto bandEditor: bandEditors)
+    for (auto bandEditor : bandEditors)
     {
         auto* band = freqProcessor.getBand (i);
         if (band->mode == activeMode)
@@ -214,8 +221,8 @@ void FrequalizerAudioProcessorEditor::resized()
         i++;
     }
 
-    auto width =
-        juce::roundToInt (bandSpace.getWidth()) / (activeBandEditors.size() + 1);
+    auto width = juce::roundToInt (bandSpace.getWidth())
+                 / (activeBandEditors.size() + 1);
     for (auto* bandEditor : activeBandEditors)
         bandEditor->setBounds (bandSpace.removeFromLeft (width));
 
@@ -223,7 +230,8 @@ void FrequalizerAudioProcessorEditor::resized()
     output.setBounds (frame.getBounds().reduced (8));
 
     plotFrame.reduce (3, 3);
-    brandingFrame = bandSpace.reduced (5);
+    brandingFrame = bandSpace.reduced (2);
+    modeControlsComponent.setBounds (brandingFrame);
 
     updateFrequencyResponses();
 }

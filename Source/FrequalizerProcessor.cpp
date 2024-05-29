@@ -9,7 +9,7 @@
 #include "FrequalizerProcessor.h"
 #include "Analyser.h"
 #include "FrequalizerEditor.h"
-#include "SocialButtons.h"
+// #include "SocialButtons.h"
 
 juce::String FrequalizerAudioProcessor::paramOutput ("output");
 juce::String FrequalizerAudioProcessor::paramType ("type");
@@ -17,6 +17,12 @@ juce::String FrequalizerAudioProcessor::paramFrequency ("frequency");
 juce::String FrequalizerAudioProcessor::paramQuality ("quality");
 juce::String FrequalizerAudioProcessor::paramGain ("gain");
 juce::String FrequalizerAudioProcessor::paramActive ("active");
+juce::String FrequalizerAudioProcessor::paramMode ("mode");
+StringArray FrequalizerAudioProcessor::modeChoices { "Stereo",
+                                                     "Mid",
+                                                     "Side",
+                                                     "MidSolo",
+                                                     "SideSolo" };
 
 namespace IDs
 {
@@ -165,7 +171,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
     auto defaults = createDefaultBands();
 
     {
-        auto param = std::make_unique<juce::AudioParameterFloat> (
+        auto outputParam = std::make_unique<juce::AudioParameterFloat> (
             FrequalizerAudioProcessor::paramOutput,
             TRANS ("Output"),
             juce::NormalisableRange<float> (0.0f, 2.0f, 0.01f),
@@ -182,8 +188,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
                     text.dropLastCharacters (3).getFloatValue());
             });
 
+        auto modeParam = std::make_unique<juce::AudioParameterChoice> (
+            FrequalizerAudioProcessor::paramMode,
+            TRANS ("Mode"),
+            FrequalizerAudioProcessor::modeChoices,
+            0);
+
         auto group = std::make_unique<juce::AudioProcessorParameterGroup> (
-            "global", TRANS ("Globals"), "|", std::move (param));
+            "global",
+            TRANS ("Globals"),
+            "|",
+            std::move (outputParam),
+            std::move (modeParam));
         params.push_back (std::move (group));
     }
 

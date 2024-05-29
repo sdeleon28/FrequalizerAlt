@@ -16,22 +16,46 @@
 
 ## Mid/Side UI
 
-[ ] Write state machine
-    [ ] Stereo
-    [ ] Mid
-    [ ] Side
-    [ ] MidSolo
-    [ ] SideSolo
-[ ] Implement UI
-    [ ] Show empty rectangle
-    [ ] Hardcoded buttons
-        [ ] Stereo + Mid/Side
-        [ ] Mid + Side
-        [ ] Solo + Solo
-    [ ] Connect UI to state machine
-        [ ] Make each button dispatch the right transition
-        [ ] Map states to element visibility and on/off state
+[X] Implement UI
+    [X] Show empty rectangle
+    [X] Hardcoded buttons
+        [X] Stereo + Mid/Side
+        [X] Mid + Side
+        [X] Solo + Solo
+    [X] Connect UI to param
+
+## Bands UI
+
+[ ] Stereo should show stereo bands
+[ ] Mid or MidSolo should show mid bands
+[ ] Side or SideSolo should show side bands
+
+## Audio part
+
+[ ] Stereo should keep working as usual
+[ ] When in Mid or Side mode, both Mid and Side need to be processed and outputted
+    [ ] Decode into mid and side channels
+    [ ] Process mid channel with mid bands
+    [ ] Process side channel with side bands
+    [ ] Re-encode back to stereo
+[ ] Mid solo
+    [ ] Decode into mid and side channels
+    [ ] Process mid channel with mid bands
+    [ ] Side channel needs to be silence
+    [ ] Re-encode back to stereo
+[ ] Side solo
+    [ ] Decode into mid and side channels
+    [ ] Process side channel with side bands
+    [ ] Mid channel needs to be silence
+    [ ] Re-encode back to stereo
 
 ## Cleanup
 
 [ ] Remove JUCE_DISABLE_ASSERTIONS=1 from CMakeLists.txt
+[ ] Look for FIXMEs
+[ ] Re-enable branding?
+
+## Deployment
+
+[ ] Create plugin in Release mode and copy to the appropriate location
+[ ] Notify original author?

@@ -53,6 +53,8 @@ public:
     static juce::String paramQuality;
     static juce::String paramGain;
     static juce::String paramActive;
+    static juce::String paramMode;
+    static StringArray modeChoices;
 
     static juce::String getBandID (size_t index);
     static juce::String getTypeParamName (size_t index);
