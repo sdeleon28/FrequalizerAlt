@@ -129,4 +129,6 @@ private:
     juce::SharedResourcePointer<juce::TooltipWindow> tooltipWindow;
 
     juce::PopupMenu contextMenu;
+
+    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
 };

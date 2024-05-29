@@ -9,6 +9,11 @@
 [X] Fix q jump interval
 [X] Undo everything about solo
 
+## Params
+
+[X] Add params for Normal, Mid and Side
+[X] Why are all params after the 6th one all Q18?
+
 ## Mid/Side UI
 
 [ ] Write state machine

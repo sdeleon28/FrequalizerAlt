@@ -25,6 +25,22 @@ juce::String sizeX { "size-x" };
 juce::String sizeY { "size-y" };
 } // namespace IDs
 
+namespace
+{
+#define MID_SIDE_ON 1
+#ifdef MID_SIDE_ON
+std::vector<FrequalizerAudioProcessor::FilterMode> filterModes = {
+    FrequalizerAudioProcessor::Normal,
+    FrequalizerAudioProcessor::Mid,
+    FrequalizerAudioProcessor::Side
+};
+#else
+std::vector<FrequalizerAudioProcessor::FilterMode> filterModes {
+    FrequalizerAudioProcessor::Normal
+};
+#endif
+} // namespace
+
 juce::String FrequalizerAudioProcessor::getBandID (size_t index)
 {
     switch (index)
@@ -41,6 +57,33 @@ juce::String FrequalizerAudioProcessor::getBandID (size_t index)
             return "High";
         case 5:
             return "Highest";
+
+        case 6:
+            return "Lowest (M)";
+        case 7:
+            return "Low (M)";
+        case 8:
+            return "Low Mids (M)";
+        case 9:
+            return "High Mids (M)";
+        case 10:
+            return "High (M)";
+        case 11:
+            return "Highest (M)";
+
+        case 12:
+            return "Lowest (S)";
+        case 13:
+            return "Low (S)";
+        case 14:
+            return "Low Mids (S)";
+        case 15:
+            return "High Mids (S)";
+        case 16:
+            return "High (S)";
+        case 17:
+            return "Highest (S)";
+
         default:
             break;
     }
@@ -49,7 +92,7 @@ juce::String FrequalizerAudioProcessor::getBandID (size_t index)
 
 int FrequalizerAudioProcessor::getBandIndexFromID (juce::String paramID)
 {
-    for (size_t i = 0; i < 6; ++i)
+    for (size_t i = 0; i < (size_t) paramsPerFilter * filterModes.size(); ++i)
         if (paramID.startsWith (getBandID (i) + "-"))
             return int (i);
 
@@ -59,56 +102,51 @@ int FrequalizerAudioProcessor::getBandIndexFromID (juce::String paramID)
 std::vector<FrequalizerAudioProcessor::Band> createDefaultBands()
 {
     std::vector<FrequalizerAudioProcessor::Band> defaults;
-#define MID_SIDE_ON 1
-#ifdef MID_SIDE_ON
-    std::vector<FrequalizerAudioProcessor::FilterMode> modes {
-        FrequalizerAudioProcessor::FilterMode::Mid,
-        FrequalizerAudioProcessor::FilterMode::Side
-    };
-#else
-    std::vector<FrequalizerAudioProcessor::FilterMode> modes {
-        FrequalizerAudioProcessor::FilterMode::Normal
-    };
-#endif
-    for (auto mode : modes)
+    for (auto mode : filterModes)
     {
+        String suffix = "";
+        if (mode == FrequalizerAudioProcessor::FilterMode::Mid)
+            suffix = " (M)";
+        else if (mode == FrequalizerAudioProcessor::FilterMode::Side)
+            suffix = " (S)";
+
         defaults.push_back (FrequalizerAudioProcessor::Band (
-            TRANS ("Lowest"),
+            TRANS ("Lowest" + suffix),
             mode,
             juce::Colours::blue,
             FrequalizerAudioProcessor::HighPass,
             20.0f,
             0.707f));
         defaults.push_back (FrequalizerAudioProcessor::Band (
-            TRANS ("Low"),
+            TRANS ("Low" + suffix),
             mode,
             juce::Colours::brown,
             FrequalizerAudioProcessor::LowShelf,
             250.0f,
             0.707f));
         defaults.push_back (
-            FrequalizerAudioProcessor::Band (TRANS ("Low Mids"),
+            FrequalizerAudioProcessor::Band (TRANS ("Low Mids" + suffix),
                                              mode,
                                              juce::Colours::green,
                                              FrequalizerAudioProcessor::Peak,
                                              500.0f,
                                              0.707f));
         defaults.push_back (
-            FrequalizerAudioProcessor::Band (TRANS ("High Mids"),
+            FrequalizerAudioProcessor::Band (TRANS ("High Mids" + suffix),
                                              mode,
                                              juce::Colours::coral,
                                              FrequalizerAudioProcessor::Peak,
                                              1000.0f,
                                              0.707f));
         defaults.push_back (FrequalizerAudioProcessor::Band (
-            TRANS ("High"),
+            TRANS ("High" + suffix),
             mode,
             juce::Colours::orange,
             FrequalizerAudioProcessor::HighShelf,
             5000.0f,
             0.707f));
         defaults.push_back (
-            FrequalizerAudioProcessor::Band (TRANS ("Highest"),
+            FrequalizerAudioProcessor::Band (TRANS ("Highest" + suffix),
                                              mode,
                                              juce::Colours::red,
                                              FrequalizerAudioProcessor::LowPass,
@@ -227,9 +265,23 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
             { return value > 0.5f ? TRANS ("active") : TRANS ("bypassed"); },
             [] (juce::String text) { return text == TRANS ("active"); });
 
+        String modeString;
+        switch (defaults[i].mode)
+        {
+            case FrequalizerAudioProcessor::FilterMode::Normal:
+                modeString = "Normal";
+                break;
+            case FrequalizerAudioProcessor::FilterMode::Mid:
+                modeString = "Mid";
+                break;
+            case FrequalizerAudioProcessor::FilterMode::Side:
+                modeString = "Side";
+                break;
+        }
+
         auto group = std::make_unique<juce::AudioProcessorParameterGroup> (
             "band" + juce::String (i),
-            defaults[i].name,
+            defaults[i].name + " (" + modeString + ")",
             "|",
             std::move (typeParameter),
             std::move (freqParameter),

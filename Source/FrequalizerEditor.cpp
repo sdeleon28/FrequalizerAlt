@@ -165,11 +165,6 @@ void FrequalizerAudioProcessorEditor::paint (juce::Graphics& g)
         "Output", plotFrame.reduced (8, 28), juce::Justification::topRight, 1);
     g.strokePath (analyserPath, juce::PathStrokeType (1.0));
 
-#ifdef MID_SIDE_ON
-    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
-#else
-    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
-#endif
     for (size_t i = 0; i < freqProcessor.getNumBands(); ++i)
     {
         auto* band = freqProcessor.getBand (i);
@@ -208,13 +203,6 @@ void FrequalizerAudioProcessorEditor::resized()
     /* socialButtons.setBounds (plotFrame.removeFromBottom (35)); */
 
     auto bandSpace = plotFrame.removeFromBottom (getHeight() / 2);
-
-#define MID_SIDE_ON 1
-#ifdef MID_SIDE_ON
-    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
-#else
-    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
-#endif
 
     activeBandEditors.clear();
     size_t i = 0;

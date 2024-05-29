@@ -206,4 +206,6 @@ private:
     Analyser<float> outputAnalyser;
 
     juce::Point<int> editorSize = { 900, 500 };
+
+    int paramsPerFilter = 6;
 };
