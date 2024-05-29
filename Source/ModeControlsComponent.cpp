@@ -7,7 +7,6 @@ ModeControlsComponent::ModeControlsComponent (
     // FIXME: Move these constants to where they can be used without
     // back-referencing the processor
     pluginState.addParameterListener ("mode", this);
-
     auto setupButton = [this] (TextButton& button, String text)
     {
         button.setButtonText (text);
@@ -25,6 +24,11 @@ ModeControlsComponent::ModeControlsComponent (
     setupButton (sideButton, TRANS ("side"));
     setupButton (midSoloButton, TRANS ("solo"));
     setupButton (sideSoloButton, TRANS ("solo"));
+}
+
+ModeControlsComponent::~ModeControlsComponent()
+{
+    pluginState.removeParameterListener ("mode", this);
 }
 
 void ModeControlsComponent::paint (Graphics& /* g */) {}

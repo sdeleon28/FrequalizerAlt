@@ -18,9 +18,11 @@
 //==============================================================================
 /**
  */
-class FrequalizerAudioProcessorEditor : public juce::AudioProcessorEditor,
-                                        public juce::ChangeListener,
-                                        public juce::Timer
+class FrequalizerAudioProcessorEditor
+    : public juce::AudioProcessorEditor,
+      public juce::ChangeListener,
+      public juce::Timer,
+      public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     FrequalizerAudioProcessorEditor (FrequalizerAudioProcessor&);
@@ -30,9 +32,10 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
+    void parameterChanged (const juce::String& parameter,
+                           float newValue) override;
     void changeListenerCallback (juce::ChangeBroadcaster* sender) override;
     void timerCallback() override;
-
     void mouseDown (const juce::MouseEvent& e) override;
 
     void mouseMove (const juce::MouseEvent& e) override;
@@ -135,5 +138,6 @@ private:
 
     ModeControlsComponent modeControlsComponent;
 
-    FrequalizerAudioProcessor::FilterMode activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+    FrequalizerAudioProcessor::FilterMode activeMode =
+        FrequalizerAudioProcessor::FilterMode::Normal;
 };

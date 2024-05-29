@@ -210,4 +210,5 @@ private:
     juce::Point<int> editorSize = { 900, 500 };
 
     int paramsPerFilter = 6;
+    FilterMode activeMode = FilterMode::Normal;
 };

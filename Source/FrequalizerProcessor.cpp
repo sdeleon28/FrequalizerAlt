@@ -344,6 +344,7 @@ FrequalizerAudioProcessor::FrequalizerAudioProcessor()
     }
 
     state.addParameterListener (paramOutput, this);
+    state.addParameterListener (paramMode, this);
 
     state.state = juce::ValueTree (JucePlugin_Name);
 }
@@ -501,6 +502,27 @@ void FrequalizerAudioProcessor::parameterChanged (const juce::String& parameter,
     if (parameter == paramOutput)
     {
         filter.get<6>().setGainLinear (newValue);
+        updatePlots();
+        return;
+    }
+
+    if (parameter == paramMode)
+    {
+        auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
+            state.getParameter (parameter));
+        auto choiceName = modeParam.getCurrentChoiceName();
+        if (choiceName == "Stereo")
+            activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+        else if (choiceName == "Mid")
+            activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
+        else if (choiceName == "Side")
+            activeMode = FrequalizerAudioProcessor::FilterMode::Side;
+        else if (choiceName == "MidSolo")
+            activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
+        else if (choiceName == "SideSolo")
+            activeMode = FrequalizerAudioProcessor::FilterMode::Side;
+        else
+            activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
         updatePlots();
         return;
     }
@@ -736,7 +758,7 @@ void FrequalizerAudioProcessor::updatePlots()
     else
     {
         for (size_t i = 0; i < bands.size(); ++i)
-            if (bands[i].active)
+            if (bands[i].active && bands[i].mode == activeMode)
                 juce::FloatVectorOperations::multiply (
                     magnitudes.data(),
                     bands[i].magnitudes.data(),

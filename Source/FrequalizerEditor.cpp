@@ -23,13 +23,15 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
 {
     tooltipWindow->setMillisecondsBeforeTipAppears (1000);
 
+    freqProcessor.getPluginState().addParameterListener (
+        FrequalizerAudioProcessor::paramMode, this);
+
     /* addAndMakeVisible (socialButtons); */
 
     for (size_t i = 0; i < freqProcessor.getNumBands(); ++i)
     {
         auto* bandEditor = bandEditors.add (new BandEditor (i, freqProcessor));
-        if (freqProcessor.getBand (i)->mode == activeMode)
-            addAndMakeVisible (bandEditor);
+        addChildComponent (bandEditor);
     }
 
     frame.setText (TRANS ("Output"));
@@ -65,6 +67,9 @@ FrequalizerAudioProcessorEditor::~FrequalizerAudioProcessorEditor()
     juce::PopupMenu::dismissAllActiveMenus();
 
     freqProcessor.removeChangeListener (this);
+    freqProcessor.getPluginState().removeParameterListener (
+        FrequalizerAudioProcessor::paramMode, this);
+
 #ifdef JUCE_OPENGL
     openGLContext.detach();
 #endif
@@ -221,10 +226,20 @@ void FrequalizerAudioProcessorEditor::resized()
         i++;
     }
 
-    auto width = juce::roundToInt (bandSpace.getWidth())
-                 / (activeBandEditors.size() + 1);
-    for (auto* bandEditor : activeBandEditors)
-        bandEditor->setBounds (bandSpace.removeFromLeft (width));
+    int width = juce::roundToInt (bandSpace.getWidth())
+                / (int) (activeBandEditors.size() + 1);
+    for (auto* bandEditor : bandEditors)
+    {
+        if (std::find (
+                activeBandEditors.begin(), activeBandEditors.end(), bandEditor)
+            != activeBandEditors.end())
+        {
+            bandEditor->setBounds (bandSpace.removeFromLeft (width));
+            bandEditor->setVisible (true);
+        }
+        else
+            bandEditor->setVisible (false);
+    }
 
     frame.setBounds (bandSpace.removeFromTop (bandSpace.getHeight() / 2));
     output.setBounds (frame.getBounds().reduced (8));
@@ -234,6 +249,31 @@ void FrequalizerAudioProcessorEditor::resized()
     modeControlsComponent.setBounds (brandingFrame);
 
     updateFrequencyResponses();
+}
+
+void FrequalizerAudioProcessorEditor::parameterChanged (
+    const juce::String& parameter,
+    float /* newValue */)
+{
+    if (parameter != FrequalizerAudioProcessor::paramMode)
+        return;
+    auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
+        freqProcessor.getPluginState().getParameter (parameter));
+    auto choiceName = modeParam.getCurrentChoiceName();
+    if (choiceName == "Stereo")
+        activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+    else if (choiceName == "Mid")
+        activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
+    else if (choiceName == "Side")
+        activeMode = FrequalizerAudioProcessor::FilterMode::Side;
+    else if (choiceName == "MidSolo")
+        activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
+    else if (choiceName == "SideSolo")
+        activeMode = FrequalizerAudioProcessor::FilterMode::Side;
+    else
+        activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+    repaint();
+    resized();
 }
 
 void FrequalizerAudioProcessorEditor::changeListenerCallback (

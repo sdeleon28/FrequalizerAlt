@@ -26,9 +26,15 @@
 
 ## Bands UI
 
-[ ] Stereo should show stereo bands
-[ ] Mid or MidSolo should show mid bands
-[ ] Side or SideSolo should show side bands
+[X] Stereo should show stereo bands
+[X] Mid or MidSolo should show mid bands
+[X] Side or SideSolo should show side bands
+
+## Plots
+
+[X] Stereo should show stereo plots
+[X] Mid or MidSolo should show mid plots
+[X] Side or SideSolo should show side plots
 
 ## Audio part
 

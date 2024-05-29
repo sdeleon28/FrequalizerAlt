@@ -23,6 +23,7 @@ public:
     };
 
     ModeControlsComponent (AudioProcessorValueTreeState& thePluginState);
+    ~ModeControlsComponent() override;
 
     void paint (Graphics&) override;
     void resized() override;
