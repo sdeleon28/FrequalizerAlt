@@ -421,6 +421,8 @@ void FrequalizerAudioProcessor::prepareToPlay (double newSampleRate,
     updatePlots();
 
     filter.prepare (spec);
+    midFilter.prepare (spec);
+    sideFilter.prepare (spec);
 
     // FIXME: Easier to just set all these gains to 1 than to refactor every
     // index dependant bit of code
@@ -459,14 +461,73 @@ void FrequalizerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     if (getActiveEditor() != nullptr)
         inputAnalyser.addAudioData (buffer, 0, getTotalNumInputChannels());
 
-    if (wasBypassed)
+    if (activeMode == FilterMode::Stereo)
     {
-        filter.reset();
-        wasBypassed = false;
+        if (wasBypassed)
+        {
+            filter.reset();
+            wasBypassed = false;
+        }
+        juce::dsp::AudioBlock<float> ioBuffer (buffer);
+        juce::dsp::ProcessContextReplacing<float> context (ioBuffer);
+        filter.process (context);
     }
-    juce::dsp::AudioBlock<float> ioBuffer (buffer);
-    juce::dsp::ProcessContextReplacing<float> context (ioBuffer);
-    filter.process (context);
+    else
+    {
+        float* leftChannel = buffer.getWritePointer (0);
+        float* rightChannel = buffer.getWritePointer (1);
+        size_t numSamples = (size_t) buffer.getNumSamples();
+
+        // Encode stereo to mid/side
+        std::vector<float> midChannel (numSamples);
+        std::vector<float> sideChannel (numSamples);
+
+        for (size_t i = 0; i < numSamples; ++i)
+        {
+            midChannel[i] = (leftChannel[i] + rightChannel[i]) / 2.0f;
+            sideChannel[i] = (rightChannel[i] - leftChannel[i]) / 3.0f;
+        }
+
+        float* midChannelPtr = midChannel.data();
+        float* sideChannelPtr = sideChannel.data();
+
+        if (activeMode == FilterMode::Mid || activeMode == FilterMode::Side)
+        {
+            auto midBlock =
+                juce::dsp::AudioBlock<float> (&midChannelPtr, 1, numSamples);
+            midFilter.process (
+                juce::dsp::ProcessContextReplacing<float> (midBlock));
+            auto sideBlock =
+                juce::dsp::AudioBlock<float> (&sideChannelPtr, 1, numSamples);
+            sideFilter.process (
+                juce::dsp::ProcessContextReplacing<float> (sideBlock));
+        }
+        else if (activeMode == FilterMode::MidSolo)
+        {
+            auto midBlock =
+                juce::dsp::AudioBlock<float> (&midChannelPtr, 1, numSamples);
+            midFilter.process (
+                juce::dsp::ProcessContextReplacing<float> (midBlock));
+            for (size_t j = 0; j < numSamples; ++j)
+                sideChannel[j] = 0.0f;
+        }
+        else if (activeMode == FilterMode::SideSolo)
+        {
+            auto sideBlock =
+                juce::dsp::AudioBlock<float> (&sideChannelPtr, 1, numSamples);
+            sideFilter.process (
+                juce::dsp::ProcessContextReplacing<float> (sideBlock));
+            for (size_t j = 0; j < numSamples; ++j)
+                midChannel[j] = 0.0f;
+        }
+
+        // Decode mid/side back to stereo
+        for (size_t i = 0; i < numSamples; ++i)
+        {
+            leftChannel[i] = midChannel[i] - sideChannel[i];
+            rightChannel[i] = midChannel[i] + sideChannel[i];
+        }
+    }
 
     auto outputGainBlock =
         juce::dsp::AudioBlock<float> (buffer.getArrayOfWritePointers(),
@@ -605,6 +666,20 @@ void FrequalizerAudioProcessor::updateBypassedStates()
         filter.setBypassed<3> (soloed != 3);
         filter.setBypassed<4> (soloed != 4);
         filter.setBypassed<5> (soloed != 5);
+
+        midFilter.setBypassed<0> (soloed != 6);
+        midFilter.setBypassed<1> (soloed != 7);
+        midFilter.setBypassed<2> (soloed != 8);
+        midFilter.setBypassed<3> (soloed != 9);
+        midFilter.setBypassed<4> (soloed != 10);
+        midFilter.setBypassed<5> (soloed != 11);
+
+        sideFilter.setBypassed<0> (soloed != 12);
+        sideFilter.setBypassed<1> (soloed != 13);
+        sideFilter.setBypassed<2> (soloed != 14);
+        sideFilter.setBypassed<3> (soloed != 15);
+        sideFilter.setBypassed<4> (soloed != 16);
+        sideFilter.setBypassed<5> (soloed != 17);
     }
     else
     {
@@ -614,7 +689,22 @@ void FrequalizerAudioProcessor::updateBypassedStates()
         filter.setBypassed<3> (! bands[3].active);
         filter.setBypassed<4> (! bands[4].active);
         filter.setBypassed<5> (! bands[5].active);
+
+        midFilter.setBypassed<0> (! bands[6].active);
+        midFilter.setBypassed<1> (! bands[7].active);
+        midFilter.setBypassed<2> (! bands[8].active);
+        midFilter.setBypassed<3> (! bands[9].active);
+        midFilter.setBypassed<4> (! bands[10].active);
+        midFilter.setBypassed<5> (! bands[11].active);
+
+        midFilter.setBypassed<0> (! bands[12].active);
+        midFilter.setBypassed<1> (! bands[13].active);
+        midFilter.setBypassed<2> (! bands[14].active);
+        midFilter.setBypassed<3> (! bands[15].active);
+        midFilter.setBypassed<4> (! bands[16].active);
+        midFilter.setBypassed<5> (! bands[17].active);
     }
+
     updatePlots();
 }
 
@@ -744,6 +834,32 @@ void FrequalizerAudioProcessor::updateBand (const size_t index)
                     *filter.get<4>().state = *newCoefficients;
                 else if (index == 5)
                     *filter.get<5>().state = *newCoefficients;
+
+                if (index == 6)
+                    *midFilter.get<0>().state = *newCoefficients;
+                else if (index == 7)
+                    *midFilter.get<1>().state = *newCoefficients;
+                else if (index == 8)
+                    *midFilter.get<2>().state = *newCoefficients;
+                else if (index == 9)
+                    *midFilter.get<3>().state = *newCoefficients;
+                else if (index == 10)
+                    *midFilter.get<4>().state = *newCoefficients;
+                else if (index == 11)
+                    *midFilter.get<5>().state = *newCoefficients;
+
+                if (index == 12)
+                    *sideFilter.get<0>().state = *newCoefficients;
+                else if (index == 13)
+                    *sideFilter.get<1>().state = *newCoefficients;
+                else if (index == 14)
+                    *sideFilter.get<2>().state = *newCoefficients;
+                else if (index == 15)
+                    *sideFilter.get<3>().state = *newCoefficients;
+                else if (index == 16)
+                    *sideFilter.get<4>().state = *newCoefficients;
+                else if (index == 17)
+                    *sideFilter.get<5>().state = *newCoefficients;
             }
             newCoefficients->getMagnitudeForFrequencyArray (
                 frequencies.data(),

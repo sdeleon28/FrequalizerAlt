@@ -70,8 +70,7 @@
 [X] Make sure gain being applied to output is the same applied to the plot
 [X] BUG: Bands disappear when in solo mode
 [X] BUG: I'm getting absolute silence
-[ ] Test all of the above
-[ ] See FIXME in isCompatibleWith. It's important!
+[X] Test all of the above -> IT WORKS!
 
 ## More UI
 
@@ -86,6 +85,10 @@
 [ ] Remove JUCE_DISABLE_ASSERTIONS=1 from CMakeLists.txt
 [ ] Look for FIXMEs
 [ ] Re-enable branding?
+
+## Tech debt
+
+[ ] See FIXME in isCompatibleWith
 
 ## Deployment
 
