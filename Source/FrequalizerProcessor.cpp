@@ -413,14 +413,20 @@ void FrequalizerAudioProcessor::prepareToPlay (double newSampleRate,
     spec.numChannels = juce::uint32 (getTotalNumOutputChannels());
 
     for (size_t i = 0; i < bands.size(); ++i)
-    {
         updateBand (i);
-    }
-    filter.get<6>().setGainLinear (*state.getRawParameterValue (paramOutput));
+
+    outputGain.prepare (spec);
+    outputGain.setGainLinear (*state.getRawParameterValue (paramOutput));
 
     updatePlots();
 
     filter.prepare (spec);
+
+    // FIXME: Easier to just set all these gains to 1 than to refactor every
+    // index dependant bit of code
+    filter.get<6>().setGainLinear (1);
+    midFilter.get<6>().setGainLinear (1);
+    sideFilter.get<6>().setGainLinear (1);
 
     inputAnalyser.setupAnalyser (int (sampleRate), float (sampleRate));
     outputAnalyser.setupAnalyser (int (sampleRate), float (sampleRate));
@@ -462,6 +468,13 @@ void FrequalizerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::ProcessContextReplacing<float> context (ioBuffer);
     filter.process (context);
 
+    auto outputGainBlock =
+        juce::dsp::AudioBlock<float> (buffer.getArrayOfWritePointers(),
+                                      (size_t) buffer.getNumChannels(),
+                                      (size_t) buffer.getNumSamples());
+    outputGain.process (
+        juce::dsp::ProcessContextReplacing<float> (outputGainBlock));
+
     if (getActiveEditor() != nullptr)
         outputAnalyser.addAudioData (buffer, 0, getTotalNumOutputChannels());
 }
@@ -501,7 +514,7 @@ void FrequalizerAudioProcessor::parameterChanged (const juce::String& parameter,
 {
     if (parameter == paramOutput)
     {
-        filter.get<6>().setGainLinear (newValue);
+        outputGain.setGainLinear (newValue);
         updatePlots();
         return;
     }
@@ -745,7 +758,7 @@ void FrequalizerAudioProcessor::updateBand (const size_t index)
 
 void FrequalizerAudioProcessor::updatePlots()
 {
-    auto gain = filter.get<6>().getGainLinear();
+    auto gain = outputGain.getGainLinear();
     std::fill (magnitudes.begin(), magnitudes.end(), gain);
 
     if (juce::isPositiveAndBelow (soloed, bands.size()))

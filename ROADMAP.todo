@@ -68,13 +68,9 @@
             [X] Gain
             [X] Calculate coefficients
 [X] Make sure gain being applied to output is the same applied to the plot
-[-] Test all of the above
-    [X] Bands disappear when in solo mode
-    [ ] I'm getting absolute silence in all modes
-        [ ] Test modes one by one
-            [ ] Start by making sure stereo path still works
-            [ ] Then see if you can have midside path
-            [ ] Then solo paths
+[X] BUG: Bands disappear when in solo mode
+[X] BUG: I'm getting absolute silence
+[ ] Test all of the above
 [ ] See FIXME in isCompatibleWith. It's important!
 
 ## More UI
