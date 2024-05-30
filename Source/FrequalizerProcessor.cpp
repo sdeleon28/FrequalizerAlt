@@ -36,13 +36,13 @@ namespace
 #define MID_SIDE_ON 1
 #ifdef MID_SIDE_ON
 std::vector<FrequalizerAudioProcessor::FilterMode> filterModes = {
-    FrequalizerAudioProcessor::Normal,
+    FrequalizerAudioProcessor::Stereo,
     FrequalizerAudioProcessor::Mid,
     FrequalizerAudioProcessor::Side
 };
 #else
 std::vector<FrequalizerAudioProcessor::FilterMode> filterModes {
-    FrequalizerAudioProcessor::Normal
+    FrequalizerAudioProcessor::Stereo
 };
 #endif
 } // namespace
@@ -284,8 +284,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
         String modeString;
         switch (defaults[i].mode)
         {
-            case FrequalizerAudioProcessor::FilterMode::Normal:
-                modeString = "Normal";
+            case FrequalizerAudioProcessor::FilterMode::Stereo:
+                modeString = "Stereo";
                 break;
             case FrequalizerAudioProcessor::FilterMode::Mid:
                 modeString = "Mid";
@@ -512,17 +512,17 @@ void FrequalizerAudioProcessor::parameterChanged (const juce::String& parameter,
             state.getParameter (parameter));
         auto choiceName = modeParam.getCurrentChoiceName();
         if (choiceName == "Stereo")
-            activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+            activeMode = FrequalizerAudioProcessor::FilterMode::Stereo;
         else if (choiceName == "Mid")
             activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
         else if (choiceName == "Side")
             activeMode = FrequalizerAudioProcessor::FilterMode::Side;
         else if (choiceName == "MidSolo")
-            activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
+            activeMode = FrequalizerAudioProcessor::FilterMode::MidSolo;
         else if (choiceName == "SideSolo")
-            activeMode = FrequalizerAudioProcessor::FilterMode::Side;
+            activeMode = FrequalizerAudioProcessor::FilterMode::SideSolo;
         else
-            activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+            activeMode = FrequalizerAudioProcessor::FilterMode::Stereo;
         updatePlots();
         return;
     }

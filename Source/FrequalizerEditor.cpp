@@ -180,7 +180,7 @@ void FrequalizerAudioProcessorEditor::paint (juce::Graphics& g)
     for (size_t i = 0; i < freqProcessor.getNumBands(); ++i)
     {
         auto* band = freqProcessor.getBand (i);
-        if (band->mode != activeMode)
+        if (! band->isCompatibleWith (activeMode))
             continue;
 
         auto* bandEditor = bandEditors.getUnchecked (int (i));
@@ -221,7 +221,7 @@ void FrequalizerAudioProcessorEditor::resized()
     for (auto bandEditor : bandEditors)
     {
         auto* band = freqProcessor.getBand (i);
-        if (band->mode == activeMode)
+        if (band->isCompatibleWith (activeMode))
             activeBandEditors.push_back (bandEditor);
         i++;
     }
@@ -261,17 +261,20 @@ void FrequalizerAudioProcessorEditor::parameterChanged (
         freqProcessor.getPluginState().getParameter (parameter));
     auto choiceName = modeParam.getCurrentChoiceName();
     if (choiceName == "Stereo")
-        activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+        activeMode = FrequalizerAudioProcessor::FilterMode::Stereo;
     else if (choiceName == "Mid")
         activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
     else if (choiceName == "Side")
         activeMode = FrequalizerAudioProcessor::FilterMode::Side;
     else if (choiceName == "MidSolo")
-        activeMode = FrequalizerAudioProcessor::FilterMode::Mid;
+        activeMode = FrequalizerAudioProcessor::FilterMode::MidSolo;
     else if (choiceName == "SideSolo")
-        activeMode = FrequalizerAudioProcessor::FilterMode::Side;
+        activeMode = FrequalizerAudioProcessor::FilterMode::SideSolo;
     else
-        activeMode = FrequalizerAudioProcessor::FilterMode::Normal;
+    {
+        jassertfalse;
+        activeMode = FrequalizerAudioProcessor::FilterMode::Stereo;
+    }
     repaint();
     resized();
 }

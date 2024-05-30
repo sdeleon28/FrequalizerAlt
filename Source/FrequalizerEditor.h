@@ -139,5 +139,5 @@ private:
     ModeControlsComponent modeControlsComponent;
 
     FrequalizerAudioProcessor::FilterMode activeMode =
-        FrequalizerAudioProcessor::FilterMode::Normal;
+        FrequalizerAudioProcessor::FilterMode::Stereo;
 };

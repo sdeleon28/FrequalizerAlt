@@ -42,9 +42,11 @@ public:
 
     enum FilterMode
     {
-        Normal,
+        Stereo,
         Mid,
         Side,
+        MidSolo,
+        SideSolo,
     };
 
     static juce::String paramOutput;
@@ -151,6 +153,22 @@ public:
               gain (gainToUse),
               active (shouldBeActive)
         {
+            jassert (mode == Stereo || mode == Mid || mode == Side);
+        }
+
+        /**
+         * FIXME:
+         * I'm mixing two different things: The band type (stereo, mid or side)
+         * with the plugin mode (stereo, mid, side, mid solo, side solo). This
+         * should work for now but I should really revise this!
+         */
+        bool isCompatibleWith (FilterMode otherMode) const
+        {
+            return (
+                (mode == Stereo && otherMode == Stereo)
+                || (mode == Mid && (otherMode == Mid || otherMode == MidSolo))
+                || (mode == Side
+                    && (otherMode == Side || otherMode == SideSolo)));
         }
 
         juce::String name;
@@ -199,6 +217,22 @@ private:
                               FilterBand,
                               Gain>
         filter;
+    juce::dsp::ProcessorChain<FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              Gain>
+        midFilter;
+    juce::dsp::ProcessorChain<FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              FilterBand,
+                              Gain>
+        sideFilter;
 
     double sampleRate = 0;
 
@@ -210,5 +244,6 @@ private:
     juce::Point<int> editorSize = { 900, 500 };
 
     int paramsPerFilter = 6;
-    FilterMode activeMode = FilterMode::Normal;
+    FilterMode activeMode = FilterMode::Stereo;
+    juce::dsp::Gain<float> outputGain;
 };

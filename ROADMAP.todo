@@ -38,22 +38,52 @@
 
 ## Audio part
 
-[ ] Stereo should keep working as usual
-[ ] When in Mid or Side mode, both Mid and Side need to be processed and outputted
-    [ ] Decode into mid and side channels
-    [ ] Process mid channel with mid bands
-    [ ] Process side channel with side bands
-    [ ] Re-encode back to stereo
-[ ] Mid solo
-    [ ] Decode into mid and side channels
-    [ ] Process mid channel with mid bands
-    [ ] Side channel needs to be silence
-    [ ] Re-encode back to stereo
-[ ] Side solo
-    [ ] Decode into mid and side channels
-    [ ] Process side channel with side bands
-    [ ] Mid channel needs to be silence
-    [ ] Re-encode back to stereo
+[X] Stereo should keep working as usual
+[X] When in Mid or Side mode, both Mid and Side need to be processed and outputted
+    [X] Encode into mid and side channels
+    [X] Process mid channel with mid bands
+    [X] Process side channel with side bands
+    [X] Decode back to stereo
+[X] Mid solo
+    [X] Encode into mid and side channels
+    [X] Process mid channel with mid bands
+    [X] Side channel needs to be silence
+    [X] Decode back to stereo
+[X] Side solo
+    [X] Encode into mid and side channels
+    [X] Process side channel with side bands
+    [X] Mid channel needs to be silence
+    [X] Decode back to stereo
+[X] Create analogous filters for mid and side
+    [X] midFilters
+        [X] Tag along filters
+            [X] Prepare
+            [X] Solo state
+            [X] Gain
+            [X] Calculate coefficients
+    [X] sideFilters
+        [X] Tag along filters
+            [X] Prepare
+            [X] Solo state
+            [X] Gain
+            [X] Calculate coefficients
+[X] Make sure gain being applied to output is the same applied to the plot
+[-] Test all of the above
+    [X] Bands disappear when in solo mode
+    [ ] I'm getting absolute silence in all modes
+        [ ] Test modes one by one
+            [ ] Start by making sure stereo path still works
+            [ ] Then see if you can have midside path
+            [ ] Then solo paths
+[ ] See FIXME in isCompatibleWith. It's important!
+
+## More UI
+
+[ ] Mode selection UI should reflect stereo by default
+
+## Cherry on top
+
+[ ] Bool parameter goes fullscreen
 
 ## Cleanup
 
