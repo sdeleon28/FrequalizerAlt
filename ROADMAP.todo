@@ -78,7 +78,14 @@
 
 ## Cherry on top
 
-[ ] Bool parameter goes fullscreen
+[-] Bool parameter goes fullscreen
+    [X] Add mode indicator
+    [-] Add fullscreen param
+        [ ] Tie param to visualization mode
+        [ ] Tie mode indicator to param
+    [ ] Add fullscreen button
+    [ ] Add exit fullscreen button
+[ ] Add separate output controls for mid and side
 
 ## Cleanup
 

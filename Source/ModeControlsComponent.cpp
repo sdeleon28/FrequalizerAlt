@@ -105,7 +105,7 @@ void ModeControlsComponent::updateUi()
     };
     switch (currentMode)
     {
-        case Mode::Stereo:
+        case PluginMode::Stereo:
             stereoButton.setToggleState (true, dontSendNotification);
             midSideButton.setToggleState (false, dontSendNotification);
             midButton.setToggleState (false, dontSendNotification);
@@ -114,7 +114,7 @@ void ModeControlsComponent::updateUi()
             sideSoloButton.setToggleState (false, dontSendNotification);
             setMidSideButtonsVisible (false);
             break;
-        case Mode::Mid:
+        case PluginMode::Mid:
             stereoButton.setToggleState (false, dontSendNotification);
             midSideButton.setToggleState (true, dontSendNotification);
             midButton.setToggleState (true, dontSendNotification);
@@ -123,7 +123,7 @@ void ModeControlsComponent::updateUi()
             sideSoloButton.setToggleState (false, dontSendNotification);
             setMidSideButtonsVisible (true);
             break;
-        case Mode::Side:
+        case PluginMode::Side:
             stereoButton.setToggleState (false, dontSendNotification);
             midSideButton.setToggleState (true, dontSendNotification);
             midButton.setToggleState (false, dontSendNotification);
@@ -132,7 +132,7 @@ void ModeControlsComponent::updateUi()
             sideSoloButton.setToggleState (false, dontSendNotification);
             setMidSideButtonsVisible (true);
             break;
-        case Mode::MidSolo:
+        case PluginMode::MidSolo:
             stereoButton.setToggleState (false, dontSendNotification);
             midSideButton.setToggleState (true, dontSendNotification);
             midButton.setToggleState (true, dontSendNotification);
@@ -141,7 +141,7 @@ void ModeControlsComponent::updateUi()
             sideSoloButton.setToggleState (false, dontSendNotification);
             setMidSideButtonsVisible (true);
             break;
-        case Mode::SideSolo:
+        case PluginMode::SideSolo:
             stereoButton.setToggleState (false, dontSendNotification);
             midSideButton.setToggleState (true, dontSendNotification);
             midButton.setToggleState (false, dontSendNotification);

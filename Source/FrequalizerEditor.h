@@ -14,6 +14,7 @@
 #include <juce_opengl/juce_opengl.h>
 
 #include "ModeControlsComponent.h"
+#include "ModeIndicator.h"
 
 //==============================================================================
 /**
@@ -136,6 +137,7 @@ private:
 
     juce::PopupMenu contextMenu;
 
+    ModeIndicator modeIndicator;
     ModeControlsComponent modeControlsComponent;
 
     FrequalizerAudioProcessor::FilterMode activeMode =

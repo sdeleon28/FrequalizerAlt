@@ -19,6 +19,7 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
     FrequalizerAudioProcessor& p)
     : juce::AudioProcessorEditor (&p),
       freqProcessor (p),
+      modeIndicator (freqProcessor.getPluginState()),
       modeControlsComponent (freqProcessor.getPluginState())
 {
     tooltipWindow->setMillisecondsBeforeTipAppears (1000);
@@ -57,6 +58,7 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
 
     freqProcessor.addChangeListener (this);
 
+    addAndMakeVisible (modeIndicator);
     addAndMakeVisible (modeControlsComponent);
 
     startTimerHz (30);
@@ -211,6 +213,16 @@ void FrequalizerAudioProcessorEditor::resized()
 {
     freqProcessor.setSavedSize ({ getWidth(), getHeight() });
     plotFrame = getLocalBounds().reduced (3, 3);
+
+    int modeIndicatorPaddingTop = 10;
+    int modeIndicatorHeight = 30;
+    int modeIndicatorWidth = 100;
+    auto modeIndicatorBounds = plotFrame;
+    modeIndicatorBounds.removeFromTop (modeIndicatorPaddingTop);
+    modeIndicatorBounds =
+        modeIndicatorBounds.removeFromTop (modeIndicatorHeight)
+            .withSizeKeepingCentre (modeIndicatorWidth, modeIndicatorHeight);
+    modeIndicator.setBounds (modeIndicatorBounds);
 
     /* socialButtons.setBounds (plotFrame.removeFromBottom (35)); */
 

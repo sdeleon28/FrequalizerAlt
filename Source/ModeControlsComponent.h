@@ -4,20 +4,14 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 using namespace juce;
 
+#include "PluginMode.h"
+
 class ModeControlsComponent : public Component,
                               public TextButton::Listener,
                               AudioProcessorValueTreeState::Listener
 {
 public:
-    enum Mode
-    {
-        Stereo,
-        Mid,
-        Side,
-        MidSolo,
-        SideSolo,
-    };
-    std::map<String, Mode> modeMap = {
+    std::map<String, PluginMode> modeMap = {
         { "Stereo", Stereo },   { "Mid", Mid },           { "Side", Side },
         { "MidSolo", MidSolo }, { "SideSolo", SideSolo },
     };
@@ -42,5 +36,5 @@ private:
     TextButton sideButton;
     TextButton midSoloButton;
     TextButton sideSoloButton;
-    Mode currentMode = Stereo;
+    PluginMode currentMode = Stereo;
 };
