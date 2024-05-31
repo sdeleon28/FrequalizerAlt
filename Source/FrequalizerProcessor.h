@@ -56,6 +56,7 @@ public:
     static juce::String paramGain;
     static juce::String paramActive;
     static juce::String paramMode;
+    static juce::String paramFullscreen;
     static StringArray modeChoices;
 
     static juce::String getBandID (size_t index);

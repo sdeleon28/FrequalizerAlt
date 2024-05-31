@@ -137,6 +137,7 @@ private:
 
     juce::PopupMenu contextMenu;
 
+    bool isFullscreen = false;
     ModeIndicator modeIndicator;
     ModeControlsComponent modeControlsComponent;
 

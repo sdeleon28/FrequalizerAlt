@@ -18,6 +18,7 @@ juce::String FrequalizerAudioProcessor::paramQuality ("quality");
 juce::String FrequalizerAudioProcessor::paramGain ("gain");
 juce::String FrequalizerAudioProcessor::paramActive ("active");
 juce::String FrequalizerAudioProcessor::paramMode ("mode");
+juce::String FrequalizerAudioProcessor::paramFullscreen ("fullscreen");
 StringArray FrequalizerAudioProcessor::modeChoices { "Stereo",
                                                      "Mid",
                                                      "Side",
@@ -194,12 +195,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
             FrequalizerAudioProcessor::modeChoices,
             0);
 
+        auto fullscreenParam = std::make_unique<juce::AudioParameterBool> (
+            FrequalizerAudioProcessor::paramFullscreen,
+            TRANS ("Fullscreen"),
+            false);
+
         auto group = std::make_unique<juce::AudioProcessorParameterGroup> (
             "global",
             TRANS ("Globals"),
             "|",
             std::move (outputParam),
-            std::move (modeParam));
+            std::move (modeParam),
+            std::move (fullscreenParam));
         params.push_back (std::move (group));
     }
 

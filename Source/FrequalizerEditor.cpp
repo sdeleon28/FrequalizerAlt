@@ -26,6 +26,8 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
 
     freqProcessor.getPluginState().addParameterListener (
         FrequalizerAudioProcessor::paramMode, this);
+    freqProcessor.getPluginState().addParameterListener (
+        FrequalizerAudioProcessor::paramFullscreen, this);
 
     /* addAndMakeVisible (socialButtons); */
 
@@ -71,6 +73,8 @@ FrequalizerAudioProcessorEditor::~FrequalizerAudioProcessorEditor()
     freqProcessor.removeChangeListener (this);
     freqProcessor.getPluginState().removeParameterListener (
         FrequalizerAudioProcessor::paramMode, this);
+    freqProcessor.getPluginState().removeParameterListener (
+        FrequalizerAudioProcessor::paramFullscreen, this);
 
 #ifdef JUCE_OPENGL
     openGLContext.detach();
@@ -226,6 +230,23 @@ void FrequalizerAudioProcessorEditor::resized()
 
     /* socialButtons.setBounds (plotFrame.removeFromBottom (35)); */
 
+    if (isFullscreen)
+    {
+        for (auto* bandEditor : bandEditors)
+            bandEditor->setVisible (false);
+        frame.setVisible (false);
+        output.setVisible (false);
+        modeControlsComponent.setVisible (false);
+        updateFrequencyResponses();
+        return;
+    }
+    else
+    {
+        frame.setVisible (true);
+        output.setVisible (true);
+        modeControlsComponent.setVisible (true);
+    }
+
     auto bandSpace = plotFrame.removeFromBottom (getHeight() / 2);
 
     activeBandEditors.clear();
@@ -265,8 +286,15 @@ void FrequalizerAudioProcessorEditor::resized()
 
 void FrequalizerAudioProcessorEditor::parameterChanged (
     const juce::String& parameter,
-    float /* newValue */)
+    float newValue)
 {
+    if (parameter == FrequalizerAudioProcessor::paramFullscreen)
+    {
+        isFullscreen = newValue > 0.5f;
+        resized();
+        repaint();
+        return;
+    }
     if (parameter != FrequalizerAudioProcessor::paramMode)
         return;
     auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
