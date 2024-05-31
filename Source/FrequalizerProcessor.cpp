@@ -189,25 +189,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
                     text.dropLastCharacters (3).getFloatValue());
             });
 
-        auto modeParam = std::make_unique<juce::AudioParameterChoice> (
-            FrequalizerAudioProcessor::paramMode,
-            TRANS ("Mode"),
-            FrequalizerAudioProcessor::modeChoices,
-            0);
-
-        auto fullscreenParam = std::make_unique<juce::AudioParameterBool> (
-            FrequalizerAudioProcessor::paramFullscreen,
-            TRANS ("Fullscreen"),
-            false);
-
-        auto group = std::make_unique<juce::AudioProcessorParameterGroup> (
-            "global",
-            TRANS ("Globals"),
-            "|",
-            std::move (outputParam),
-            std::move (modeParam),
-            std::move (fullscreenParam));
-        params.push_back (std::move (group));
+        auto globalsGroup =
+            std::make_unique<juce::AudioProcessorParameterGroup> (
+                "global", TRANS ("Globals"), "|", std::move (outputParam));
+        params.push_back (std::move (globalsGroup));
     }
 
     for (size_t i = 0; i < defaults.size(); ++i)
@@ -314,6 +299,25 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
 
         params.push_back (std::move (group));
     }
+
+    auto modeParam = std::make_unique<juce::AudioParameterChoice> (
+        FrequalizerAudioProcessor::paramMode,
+        TRANS ("Mode"),
+        FrequalizerAudioProcessor::modeChoices,
+        0);
+
+    auto fullscreenParam = std::make_unique<juce::AudioParameterBool> (
+        FrequalizerAudioProcessor::paramFullscreen,
+        TRANS ("Fullscreen"),
+        false);
+
+    auto configsGroup = std::make_unique<juce::AudioProcessorParameterGroup> (
+        "configs",
+        TRANS ("Configs"),
+        "|",
+        std::move (modeParam),
+        std::move (fullscreenParam));
+    params.push_back (std::move (configsGroup));
 
     return { params.begin(), params.end() };
 }
