@@ -57,6 +57,7 @@ public:
     static juce::String paramActive;
     static juce::String paramMode;
     static juce::String paramFullscreen;
+    static juce::String paramBandSolo;
     static StringArray modeChoices;
 
     static juce::String getBandID (size_t index);
@@ -144,15 +145,17 @@ public:
               float frequencyToUse,
               float qualityToUse,
               float gainToUse = 1.0f,
-              bool shouldBeActive = true)
+              bool shouldBeActive = true,
+              bool shouldBeSoloed = false)
             : name (nameToUse),
               mode (modeToUse),
               colour (colourToUse),
-              type (typeToUse),
               frequency (frequencyToUse),
               quality (qualityToUse),
               gain (gainToUse),
-              active (shouldBeActive)
+              active (shouldBeActive),
+              soloed (shouldBeSoloed),
+              type (typeToUse)
         {
             jassert (mode == Stereo || mode == Mid || mode == Side);
         }
@@ -175,12 +178,24 @@ public:
         juce::String name;
         FilterMode mode;
         juce::Colour colour;
-        FilterType type = BandPass;
         float frequency = 1000.0f;
         float quality = 1.0f;
         float gain = 1.0f;
         bool active = true;
         std::vector<double> magnitudes;
+        bool soloed = false;
+
+        void setType (FilterType newType) { type = newType; }
+
+        FilterType getType() const
+        {
+            if (soloed)
+                return BandPass;
+            return type;
+        }
+
+    private:
+        FilterType type = BandPass;
     };
 
     Band* getBand (size_t index);

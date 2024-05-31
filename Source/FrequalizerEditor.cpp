@@ -374,7 +374,7 @@ void FrequalizerAudioProcessorEditor::mouseDown (const juce::MouseEvent& e)
                     FrequalizerAudioProcessor::getFilterTypeNames();
                 for (int t = 0; t < names.size(); ++t)
                     contextMenu.addItem (
-                        t + 1, names[t], true, band->type == t);
+                        t + 1, names[t], true, band->getType() == t);
 
                 contextMenu.showMenuAsync (
                     juce::PopupMenu::Options()
@@ -495,7 +495,7 @@ void FrequalizerAudioProcessorEditor::updateFrequencyResponses()
 
         if (auto* band = freqProcessor.getBand (size_t (i)))
         {
-            bandEditor->updateControls (band->type);
+            bandEditor->updateControls (band->getType());
             bandEditor->frequencyResponse.clear();
             freqProcessor.createFrequencyPlot (
                 bandEditor->frequencyResponse,
@@ -586,7 +586,7 @@ FrequalizerAudioProcessorEditor::BandEditor::BandEditor (
         processor.getPluginState(), processor.getGainParamName (index), gain));
     gain.setTooltip (TRANS ("Filter's gain"));
 
-    solo.setClickingTogglesState (true);
+    solo.setClickingTogglesState (false);
     solo.addListener (this);
     solo.setColour (juce::TextButton::buttonOnColourId, juce::Colours::yellow);
     addAndMakeVisible (solo);
@@ -719,6 +719,15 @@ void FrequalizerAudioProcessorEditor::BandEditor::buttonClicked (
 {
     if (b == &solo)
     {
-        processor.setBandSolo (solo.getToggleState() ? int (index) : -1);
+        auto& bandSoloParam = *dynamic_cast<juce::AudioParameterInt*> (
+            processor.getPluginState().getParameter (
+                FrequalizerAudioProcessor::paramBandSolo));
+        int newIntValue = bandSoloParam.get() != (int) index ? (int) index : -1;
+        int minValue = (int) bandSoloParam.getNormalisableRange().start;
+        int maxValue = (int) bandSoloParam.getNormalisableRange().end;
+        float normalizedValue =
+            (static_cast<float> ((int) newIntValue - minValue)
+             / static_cast<float> (maxValue - minValue));
+        bandSoloParam.setValueNotifyingHost (normalizedValue);
     }
 }

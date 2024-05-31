@@ -85,6 +85,7 @@
         [X] Tie mode indicator to param
     [X] Add fullscreen button
     [X] Add exit fullscreen button
+[X] Make solo a param so it can be mapped to MIDI controls
 [ ] Add separate output controls for mid and side
 
 ## Cleanup

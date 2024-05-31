@@ -9,6 +9,7 @@
 #include "FrequalizerProcessor.h"
 #include "Analyser.h"
 #include "FrequalizerEditor.h"
+#include <cstddef>
 // #include "SocialButtons.h"
 
 juce::String FrequalizerAudioProcessor::paramOutput ("output");
@@ -19,6 +20,7 @@ juce::String FrequalizerAudioProcessor::paramGain ("gain");
 juce::String FrequalizerAudioProcessor::paramActive ("active");
 juce::String FrequalizerAudioProcessor::paramMode ("mode");
 juce::String FrequalizerAudioProcessor::paramFullscreen ("fullscreen");
+juce::String FrequalizerAudioProcessor::paramBandSolo ("bandSolo");
 StringArray FrequalizerAudioProcessor::modeChoices { "Stereo",
                                                      "Mid",
                                                      "Side",
@@ -203,7 +205,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
             FrequalizerAudioProcessor::getTypeParamName (i),
             prefix + TRANS ("Filter Type"),
             FrequalizerAudioProcessor::getFilterTypeNames(),
-            defaults[i].type);
+            defaults[i].getType());
 
         auto freqParameter = std::make_unique<juce::AudioParameterFloat> (
             FrequalizerAudioProcessor::getFrequencyParamName (i),
@@ -311,12 +313,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
         TRANS ("Fullscreen"),
         false);
 
+    auto bandSoloParam = std::make_unique<juce::AudioParameterInt> (
+        FrequalizerAudioProcessor::paramBandSolo,
+        TRANS ("Band Solo"),
+        -1,
+        17,
+        -1,
+        String());
+
     auto configsGroup = std::make_unique<juce::AudioProcessorParameterGroup> (
         "configs",
         TRANS ("Configs"),
         "|",
         std::move (modeParam),
-        std::move (fullscreenParam));
+        std::move (fullscreenParam),
+        std::move (bandSoloParam));
     params.push_back (std::move (configsGroup));
 
     return { params.begin(), params.end() };
@@ -335,9 +346,7 @@ FrequalizerAudioProcessor::FrequalizerAudioProcessor()
 {
     frequencies.resize (300);
     for (size_t i = 0; i < frequencies.size(); ++i)
-    {
         frequencies[i] = 20.0 * std::pow (2.0, i / 30.0);
-    }
     magnitudes.resize (frequencies.size());
 
     // needs to be in sync with the ProcessorChain filter
@@ -356,6 +365,7 @@ FrequalizerAudioProcessor::FrequalizerAudioProcessor()
 
     state.addParameterListener (paramOutput, this);
     state.addParameterListener (paramMode, this);
+    state.addParameterListener (paramBandSolo, this);
 
     state.state = juce::ValueTree (JucePlugin_Name);
 }
@@ -612,13 +622,24 @@ void FrequalizerAudioProcessor::parameterChanged (const juce::String& parameter,
         return;
     }
 
+    if (parameter == paramBandSolo)
+    {
+        auto& soloParam = *dynamic_cast<juce::AudioParameterInt*> (
+            state.getParameter (parameter));
+        setBandSolo (soloParam.get());
+        for (size_t i = 0; i < bands.size(); ++i)
+            updateBand (i);
+        return;
+    }
+
     int index = getBandIndexFromID (parameter);
     if (juce::isPositiveAndBelow (index, bands.size()))
     {
         auto* band = getBand (size_t (index));
         if (parameter.endsWith (paramType))
         {
-            band->type = static_cast<FilterType> (static_cast<int> (newValue));
+            band->setType (
+                static_cast<FilterType> (static_cast<int> (newValue)));
         }
         else if (parameter.endsWith (paramFrequency))
         {
@@ -636,7 +657,6 @@ void FrequalizerAudioProcessor::parameterChanged (const juce::String& parameter,
         {
             band->active = newValue >= 0.5f;
         }
-
         updateBand (size_t (index));
     }
 }
@@ -715,7 +735,8 @@ void FrequalizerAudioProcessor::updateBypassedStates()
         midFilter.setBypassed<4> (! bands[16].active);
         midFilter.setBypassed<5> (! bands[17].active);
     }
-
+    for (size_t i = 0; i < bands.size(); ++i)
+        bands[i].soloed = i == size_t (soloed);
     updatePlots();
 }
 
@@ -742,7 +763,7 @@ void FrequalizerAudioProcessor::updateBand (const size_t index)
     if (sampleRate > 0)
     {
         juce::dsp::IIR::Coefficients<float>::Ptr newCoefficients;
-        switch (bands[index].type)
+        switch (bands[index].getType())
         {
             case NoFilter:
                 newCoefficients =
