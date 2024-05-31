@@ -33,6 +33,8 @@ public:
                                    StringArray choices);
 
 private:
+    void updateUi();
+
     AudioProcessorValueTreeState& pluginState;
     TextButton stereoButton;
     TextButton midSideButton;
@@ -40,4 +42,5 @@ private:
     TextButton sideButton;
     TextButton midSoloButton;
     TextButton sideSoloButton;
+    Mode currentMode = Stereo;
 };

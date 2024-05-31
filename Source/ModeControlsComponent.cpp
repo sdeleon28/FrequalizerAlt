@@ -24,6 +24,7 @@ ModeControlsComponent::ModeControlsComponent (
     setupButton (sideButton, TRANS ("side"));
     setupButton (midSoloButton, TRANS ("solo"));
     setupButton (sideSoloButton, TRANS ("solo"));
+    updateUi();
 }
 
 ModeControlsComponent::~ModeControlsComponent()
@@ -89,7 +90,12 @@ void ModeControlsComponent::parameterChanged (const String& parameterID,
     auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
         pluginState.getParameter ("mode"));
     auto stringState = modeParam.choices[(int) newValue];
-    auto currentState = modeMap[stringState];
+    currentMode = modeMap[stringState];
+    updateUi();
+}
+
+void ModeControlsComponent::updateUi()
+{
     auto setMidSideButtonsVisible = [this] (bool visible)
     {
         midButton.setVisible (visible);
@@ -97,7 +103,7 @@ void ModeControlsComponent::parameterChanged (const String& parameterID,
         midSoloButton.setVisible (visible);
         sideSoloButton.setVisible (visible);
     };
-    switch (currentState)
+    switch (currentMode)
     {
         case Mode::Stereo:
             stereoButton.setToggleState (true, dontSendNotification);
