@@ -13,6 +13,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_opengl/juce_opengl.h>
 
+#include "FullscreenButton.h"
 #include "ModeControlsComponent.h"
 #include "ModeIndicator.h"
 
@@ -93,6 +94,7 @@ public:
 
 private:
     void updateFrequencyResponses();
+    void updateFullscreenButtonBounds();
 
     static float getPositionForFrequency (float freq);
 
@@ -139,6 +141,7 @@ private:
 
     bool isFullscreen = false;
     ModeIndicator modeIndicator;
+    FullscreenButton fullscreenButton;
     ModeControlsComponent modeControlsComponent;
 
     FrequalizerAudioProcessor::FilterMode activeMode =

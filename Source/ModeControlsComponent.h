@@ -8,7 +8,7 @@ using namespace juce;
 
 class ModeControlsComponent : public Component,
                               public TextButton::Listener,
-                              AudioProcessorValueTreeState::Listener
+                              public AudioProcessorValueTreeState::Listener
 {
 public:
     std::map<String, PluginMode> modeMap = {

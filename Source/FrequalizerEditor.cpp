@@ -20,6 +20,7 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
     : juce::AudioProcessorEditor (&p),
       freqProcessor (p),
       modeIndicator (freqProcessor.getPluginState()),
+      fullscreenButton (freqProcessor.getPluginState()),
       modeControlsComponent (freqProcessor.getPluginState())
 {
     tooltipWindow->setMillisecondsBeforeTipAppears (1000);
@@ -61,6 +62,7 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
     freqProcessor.addChangeListener (this);
 
     addAndMakeVisible (modeIndicator);
+    addAndMakeVisible (fullscreenButton);
     addAndMakeVisible (modeControlsComponent);
 
     startTimerHz (30);
@@ -237,6 +239,7 @@ void FrequalizerAudioProcessorEditor::resized()
         frame.setVisible (false);
         output.setVisible (false);
         modeControlsComponent.setVisible (false);
+        updateFullscreenButtonBounds();
         updateFrequencyResponses();
         return;
     }
@@ -278,10 +281,27 @@ void FrequalizerAudioProcessorEditor::resized()
     output.setBounds (frame.getBounds().reduced (8));
 
     plotFrame.reduce (3, 3);
+
+    updateFullscreenButtonBounds();
+
     brandingFrame = bandSpace.reduced (2);
     modeControlsComponent.setBounds (brandingFrame);
 
     updateFrequencyResponses();
+}
+
+void FrequalizerAudioProcessorEditor::updateFullscreenButtonBounds()
+{
+    int fullscreenButtonPadding = 10;
+    int fullscreenButtonHeight = 30;
+    int fullscreenButtonWidth = 30;
+    auto fullscreenButtonBounds = plotFrame;
+    fullscreenButtonBounds.removeFromBottom (fullscreenButtonPadding);
+    fullscreenButtonBounds.removeFromRight (fullscreenButtonPadding);
+    fullscreenButtonBounds =
+        fullscreenButtonBounds.removeFromRight (fullscreenButtonWidth)
+            .removeFromBottom (fullscreenButtonHeight);
+    fullscreenButton.setBounds (fullscreenButtonBounds);
 }
 
 void FrequalizerAudioProcessorEditor::parameterChanged (

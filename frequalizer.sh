@@ -86,7 +86,7 @@ function configure_lsp() {
   rm compile_commands.json
   ln -s build/lsp/compile_commands.json compile_commands.json
   echo "+++ Compiling, which seems to make some LSP things work even if it fails (Ninja build neither supported nor necessary)."
-  cmake --build build/lsp --target Frequalizer
+  cmake --build build/lsp --target frequalizer
 }
 
 function print_options() {

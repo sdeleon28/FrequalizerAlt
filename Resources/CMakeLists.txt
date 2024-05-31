@@ -3,5 +3,7 @@ juce_add_binary_data(frequalizer_binary NAMESPACE FFAudioData SOURCES FB-logo.pn
                                                 GitHub-logo.png
                                                 In-logo.png
                                                 Logo-FF.png
-                                                Screenshot.png)
+                                                Screenshot.png
+                                                Expand.svg
+                                                Compress.svg)
 target_link_libraries(frequalizer PRIVATE frequalizer_binary)
