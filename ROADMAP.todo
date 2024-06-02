@@ -86,7 +86,6 @@
     [X] Add fullscreen button
     [X] Add exit fullscreen button
 [X] Make solo a param so it can be mapped to MIDI controls
-[-] Solo button/param for mid/side bands should either be disabled or should force solo mode
 [ ] Add separate output controls for mid and side
 
 ## Cleanup
