@@ -83,6 +83,8 @@ function configure_lsp() {
 function print_options() {
   echo macos
   echo macos-prod
+  echo macos-lr
+  echo macos-lr-prod
   echo lsp
   echo options
   echo help
