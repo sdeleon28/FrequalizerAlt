@@ -22,6 +22,7 @@ public:
     void parameterChanged (const String& parameterID, float newValue) override;
 
 private:
+    void updateCurrentMode();
     void updateUi();
 
     AudioProcessorValueTreeState& pluginState;

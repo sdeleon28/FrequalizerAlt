@@ -7,7 +7,7 @@ ModeIndicator::ModeIndicator (AudioProcessorValueTreeState& thePluginState)
     modeLabel.setColour (Label::textColourId, Colours::white);
     modeLabel.setJustificationType (Justification::centred);
     addAndMakeVisible(modeLabel);
-    updateUi();
+    updateCurrentMode();
 }
 
 ModeIndicator::~ModeIndicator()
@@ -15,15 +15,21 @@ ModeIndicator::~ModeIndicator()
     pluginState.removeParameterListener ("mode", this);
 }
 
-void ModeIndicator::parameterChanged (const String& parameterID, float newValue)
+void ModeIndicator::updateCurrentMode ()
+{
+    auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
+        pluginState.getParameter ("mode"));
+    auto currentChoiceName = modeParam.getCurrentChoiceName();
+    jassert (modeMap.find (currentChoiceName) != modeMap.end());
+    currentMode = modeMap[currentChoiceName];
+    updateUi();
+}
+
+void ModeIndicator::parameterChanged (const String& parameterID, float /* newValue */)
 {
     if (parameterID != "mode")
         return;
-    auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
-        pluginState.getParameter ("mode"));
-    auto stringState = modeParam.choices[(int) newValue];
-    currentMode = modeMap[stringState];
-    updateUi();
+    updateCurrentMode();
 }
 
 void ModeIndicator::paint (Graphics& g)

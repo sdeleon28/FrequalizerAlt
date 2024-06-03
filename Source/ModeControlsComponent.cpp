@@ -24,12 +24,22 @@ ModeControlsComponent::ModeControlsComponent (
     setupButton (sideButton, TRANS ("side"));
     setupButton (midSoloButton, TRANS ("solo"));
     setupButton (sideSoloButton, TRANS ("solo"));
-    updateUi();
+    updateCurrentMode();
 }
 
 ModeControlsComponent::~ModeControlsComponent()
 {
     pluginState.removeParameterListener ("mode", this);
+}
+
+void ModeControlsComponent::updateCurrentMode()
+{
+    auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
+        pluginState.getParameter ("mode"));
+    auto currentChoiceName = modeParam.getCurrentChoiceName();
+    jassert (modeMap.find (currentChoiceName) != modeMap.end());
+    currentMode = modeMap[currentChoiceName];
+    updateUi();
 }
 
 void ModeControlsComponent::paint (Graphics& /* g */) {}
@@ -87,11 +97,7 @@ void ModeControlsComponent::parameterChanged (const String& parameterID,
 {
     if (parameterID != "mode")
         return;
-    auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
-        pluginState.getParameter ("mode"));
-    auto stringState = modeParam.choices[(int) newValue];
-    currentMode = modeMap[stringState];
-    updateUi();
+    updateCurrentMode();
 }
 
 void ModeControlsComponent::updateUi()

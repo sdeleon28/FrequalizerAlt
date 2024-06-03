@@ -86,7 +86,16 @@
     [X] Add fullscreen button
     [X] Add exit fullscreen button
 [X] Make solo a param so it can be mapped to MIDI controls
+[-] Mode not loading up correctly on startup
+    [X] Indicator
+    [X] Mode controls
+    [-] Visible bands
+    [ ] Visible plots
 [ ] Add separate output controls for mid and side
+[ ] Add compiler flag to turn it into an L/R EQ
+[ ] Metering
+    [ ] Input
+    [ ] Output
 
 ## Cleanup
 

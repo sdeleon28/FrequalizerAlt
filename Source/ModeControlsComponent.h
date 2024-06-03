@@ -27,6 +27,7 @@ public:
                                    StringArray choices);
 
 private:
+    void updateCurrentMode();
     void updateUi();
 
     AudioProcessorValueTreeState& pluginState;
