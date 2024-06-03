@@ -20,7 +20,7 @@ endif()
 
 option(LR_MODE "Enable LR_MODE macro" OFF)
 if (LR_MODE)
-    set(PLUGIN_NAME "Frequalizer L/R")
+    set(PLUGIN_NAME "Frequalizer L-R")
     set(PLUGIN_CODE "FqLR")
 else()
     set(PLUGIN_NAME "Frequalizer Alt")
