@@ -50,6 +50,8 @@ public:
     };
 
     static juce::String paramOutput;
+    static juce::String paramMidOutput;
+    static juce::String paramSideOutput;
     static juce::String paramType;
     static juce::String paramFrequency;
     static juce::String paramQuality;
@@ -262,4 +264,6 @@ private:
     int paramsPerFilter = 6;
     FilterMode activeMode = FilterMode::Stereo;
     juce::dsp::Gain<float> outputGain;
+    juce::dsp::Gain<float> midGain;
+    juce::dsp::Gain<float> sideGain;
 };

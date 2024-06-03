@@ -128,6 +128,10 @@ private:
     juce::GroupComponent frame;
     juce::Slider output { juce::Slider::RotaryHorizontalVerticalDrag,
                           juce::Slider::TextBoxBelow };
+    juce::Slider midOutput { juce::Slider::RotaryHorizontalVerticalDrag,
+                             juce::Slider::TextBoxBelow };
+    juce::Slider sideOutput { juce::Slider::RotaryHorizontalVerticalDrag,
+                              juce::Slider::TextBoxBelow };
 
     /* SocialButtons socialButtons; */
 

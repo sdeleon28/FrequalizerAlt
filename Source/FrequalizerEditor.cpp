@@ -42,11 +42,23 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
     frame.setTextLabelPosition (juce::Justification::centred);
     addAndMakeVisible (frame);
     addAndMakeVisible (output);
+    addAndMakeVisible (midOutput);
+    addAndMakeVisible (sideOutput);
     attachments.add (new juce::AudioProcessorValueTreeState::SliderAttachment (
         freqProcessor.getPluginState(),
         FrequalizerAudioProcessor::paramOutput,
         output));
     output.setTooltip (TRANS ("Overall Gain"));
+    attachments.add (new juce::AudioProcessorValueTreeState::SliderAttachment (
+        freqProcessor.getPluginState(),
+        FrequalizerAudioProcessor::paramMidOutput,
+        midOutput));
+    midOutput.setTooltip (TRANS ("Mid output"));
+    attachments.add (new juce::AudioProcessorValueTreeState::SliderAttachment (
+        freqProcessor.getPluginState(),
+        FrequalizerAudioProcessor::paramSideOutput,
+        sideOutput));
+    sideOutput.setTooltip (TRANS ("Side output"));
 
     auto size = freqProcessor.getSavedSize();
     setResizable (true, true);
@@ -240,6 +252,8 @@ void FrequalizerAudioProcessorEditor::resized()
             bandEditor->setVisible (false);
         frame.setVisible (false);
         output.setVisible (false);
+        midOutput.setVisible (false);
+        sideOutput.setVisible (false);
         modeControlsComponent.setVisible (false);
         updateFullscreenButtonBounds();
         updateFrequencyResponses();
@@ -248,7 +262,18 @@ void FrequalizerAudioProcessorEditor::resized()
     else
     {
         frame.setVisible (true);
-        output.setVisible (true);
+        if (activeMode == FrequalizerAudioProcessor::FilterMode::Stereo)
+        {
+            output.setVisible (true);
+            midOutput.setVisible (false);
+            sideOutput.setVisible (false);
+        }
+        else
+        {
+            output.setVisible (false);
+            midOutput.setVisible (true);
+            sideOutput.setVisible (true);
+        }
         modeControlsComponent.setVisible (true);
     }
 
@@ -281,6 +306,10 @@ void FrequalizerAudioProcessorEditor::resized()
 
     frame.setBounds (bandSpace.removeFromTop (bandSpace.getHeight() / 2));
     output.setBounds (frame.getBounds().reduced (8));
+    auto midBounds = frame.getBounds().withWidth (frame.getWidth() / 2);
+    auto sideBounds = midBounds.withX (midBounds.getRight());
+    midOutput.setBounds (midBounds.reduced (4));
+    sideOutput.setBounds (sideBounds.reduced (4));
 
     plotFrame.reduce (3, 3);
 
@@ -338,6 +367,7 @@ void FrequalizerAudioProcessorEditor::parameterChanged (
     if (parameter == FrequalizerAudioProcessor::paramFullscreen)
     {
         isFullscreen = newValue > 0.5f;
+        updateActiveMode();
         resized();
         repaint();
         return;

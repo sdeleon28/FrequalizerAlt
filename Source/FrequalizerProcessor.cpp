@@ -13,6 +13,8 @@
 // #include "SocialButtons.h"
 
 juce::String FrequalizerAudioProcessor::paramOutput ("output");
+juce::String FrequalizerAudioProcessor::paramMidOutput ("midOutput");
+juce::String FrequalizerAudioProcessor::paramSideOutput ("sideOutput");
 juce::String FrequalizerAudioProcessor::paramType ("type");
 juce::String FrequalizerAudioProcessor::paramFrequency ("frequency");
 juce::String FrequalizerAudioProcessor::paramQuality ("quality");
@@ -328,13 +330,49 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
         -1,
         String());
 
+    auto midOutputParam = std::make_unique<juce::AudioParameterFloat> (
+        FrequalizerAudioProcessor::paramMidOutput,
+        TRANS ("Mid Output"),
+        juce::NormalisableRange<float> (0.0f, 2.0f, 0.01f),
+        1.0f,
+        TRANS ("Output level"),
+        juce::AudioProcessorParameter::genericParameter,
+        [] (float value, int) {
+            return juce::String (juce::Decibels::gainToDecibels (value), 1)
+                   + " dB";
+        },
+        [] (juce::String text)
+        {
+            return juce::Decibels::decibelsToGain (
+                text.dropLastCharacters (3).getFloatValue());
+        });
+
+    auto sideOutputParam = std::make_unique<juce::AudioParameterFloat> (
+        FrequalizerAudioProcessor::paramSideOutput,
+        TRANS ("Side Output"),
+        juce::NormalisableRange<float> (0.0f, 2.0f, 0.01f),
+        1.0f,
+        TRANS ("Output level"),
+        juce::AudioProcessorParameter::genericParameter,
+        [] (float value, int) {
+            return juce::String (juce::Decibels::gainToDecibels (value), 1)
+                   + " dB";
+        },
+        [] (juce::String text)
+        {
+            return juce::Decibels::decibelsToGain (
+                text.dropLastCharacters (3).getFloatValue());
+        });
+
     auto configsGroup = std::make_unique<juce::AudioProcessorParameterGroup> (
         "configs",
         TRANS ("Configs"),
         "|",
         std::move (modeParam),
         std::move (fullscreenParam),
-        std::move (bandSoloParam));
+        std::move (bandSoloParam),
+        std::move (midOutputParam),
+        std::move (sideOutputParam));
     params.push_back (std::move (configsGroup));
 
     return { params.begin(), params.end() };
@@ -373,6 +411,8 @@ FrequalizerAudioProcessor::FrequalizerAudioProcessor()
     state.addParameterListener (paramOutput, this);
     state.addParameterListener (paramMode, this);
     state.addParameterListener (paramBandSolo, this);
+    state.addParameterListener (paramMidOutput, this);
+    state.addParameterListener (paramSideOutput, this);
 
     state.state = juce::ValueTree (JucePlugin_Name);
 }
@@ -445,6 +485,10 @@ void FrequalizerAudioProcessor::prepareToPlay (double newSampleRate,
 
     outputGain.prepare (spec);
     outputGain.setGainLinear (*state.getRawParameterValue (paramOutput));
+    midGain.prepare (spec);
+    midGain.setGainLinear (*state.getRawParameterValue (paramMidOutput));
+    sideGain.prepare (spec);
+    sideGain.setGainLinear (*state.getRawParameterValue (paramSideOutput));
 
     updatePlots();
 
@@ -511,7 +555,7 @@ void FrequalizerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         std::vector<float> sideChannel (numSamples);
 
 #if LR_MODE
-        // Purposefully inefficient to make the rest of the code the same
+        // HACK: Purposefully inefficient to make the rest of the code the same
         for (size_t i = 0; i < numSamples; ++i)
         {
             midChannel[i] = leftChannel[i];
@@ -558,9 +602,16 @@ void FrequalizerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             for (size_t j = 0; j < numSamples; ++j)
                 midChannel[j] = 0.0f;
         }
+        auto midBlock =
+            juce::dsp::AudioBlock<float> (&midChannelPtr, 1, numSamples);
+        midGain.process (juce::dsp::ProcessContextReplacing<float> (midBlock));
+        auto sideBlock =
+            juce::dsp::AudioBlock<float> (&sideChannelPtr, 1, numSamples);
+        sideGain.process (
+            juce::dsp::ProcessContextReplacing<float> (sideBlock));
 
 #if LR_MODE
-        // And unwrap the hack from the previous hash else
+        // And unwrap the hack from the previous hash if
         for (size_t i = 0; i < numSamples; ++i)
         {
             leftChannel[i] = midChannel[i];
@@ -623,6 +674,18 @@ void FrequalizerAudioProcessor::parameterChanged (const juce::String& parameter,
     if (parameter == paramOutput)
     {
         outputGain.setGainLinear (newValue);
+        updatePlots();
+        return;
+    }
+    if (parameter == paramMidOutput)
+    {
+        midGain.setGainLinear (newValue);
+        updatePlots();
+        return;
+    }
+    if (parameter == paramSideOutput)
+    {
+        sideGain.setGainLinear (newValue);
         updatePlots();
         return;
     }
@@ -933,7 +996,18 @@ void FrequalizerAudioProcessor::updateBand (const size_t index)
 void FrequalizerAudioProcessor::updatePlots()
 {
     auto gain = outputGain.getGainLinear();
-    std::fill (magnitudes.begin(), magnitudes.end(), gain);
+    auto mGain = midGain.getGainLinear();
+    auto sGain = sideGain.getGainLinear();
+    if (activeMode == FilterMode::Stereo)
+        std::fill (magnitudes.begin(), magnitudes.end(), gain);
+    else if (activeMode == FilterMode::Mid)
+        std::fill (magnitudes.begin(), magnitudes.end(), mGain);
+    else if (activeMode == FilterMode::Side)
+        std::fill (magnitudes.begin(), magnitudes.end(), sGain);
+    else if (activeMode == FilterMode::MidSolo)
+        std::fill (magnitudes.begin(), magnitudes.end(), mGain);
+    else if (activeMode == FilterMode::SideSolo)
+        std::fill (magnitudes.begin(), magnitudes.end(), sGain);
 
     if (juce::isPositiveAndBelow (soloed, bands.size()))
     {
