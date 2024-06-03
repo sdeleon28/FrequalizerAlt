@@ -65,6 +65,8 @@ FrequalizerAudioProcessorEditor::FrequalizerAudioProcessorEditor (
     addAndMakeVisible (fullscreenButton);
     addAndMakeVisible (modeControlsComponent);
 
+    updateActiveMode();
+
     startTimerHz (30);
 }
 
@@ -304,21 +306,11 @@ void FrequalizerAudioProcessorEditor::updateFullscreenButtonBounds()
     fullscreenButton.setBounds (fullscreenButtonBounds);
 }
 
-void FrequalizerAudioProcessorEditor::parameterChanged (
-    const juce::String& parameter,
-    float newValue)
+void FrequalizerAudioProcessorEditor::updateActiveMode()
 {
-    if (parameter == FrequalizerAudioProcessor::paramFullscreen)
-    {
-        isFullscreen = newValue > 0.5f;
-        resized();
-        repaint();
-        return;
-    }
-    if (parameter != FrequalizerAudioProcessor::paramMode)
-        return;
     auto& modeParam = *dynamic_cast<juce::AudioParameterChoice*> (
-        freqProcessor.getPluginState().getParameter (parameter));
+        freqProcessor.getPluginState().getParameter (
+            FrequalizerAudioProcessor::paramMode));
     auto choiceName = modeParam.getCurrentChoiceName();
     if (choiceName == "Stereo")
         activeMode = FrequalizerAudioProcessor::FilterMode::Stereo;
@@ -339,10 +331,27 @@ void FrequalizerAudioProcessorEditor::parameterChanged (
     resized();
 }
 
+void FrequalizerAudioProcessorEditor::parameterChanged (
+    const juce::String& parameter,
+    float newValue)
+{
+    if (parameter == FrequalizerAudioProcessor::paramFullscreen)
+    {
+        isFullscreen = newValue > 0.5f;
+        resized();
+        repaint();
+        return;
+    }
+    if (parameter != FrequalizerAudioProcessor::paramMode)
+        return;
+    updateActiveMode();
+}
+
 void FrequalizerAudioProcessorEditor::changeListenerCallback (
     juce::ChangeBroadcaster* sender)
 {
     ignoreUnused (sender);
+    updateActiveMode();
     updateFrequencyResponses();
     repaint();
 }

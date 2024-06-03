@@ -93,6 +93,7 @@ public:
     };
 
 private:
+    void updateActiveMode();
     void updateFrequencyResponses();
     void updateFullscreenButtonBounds();
 
