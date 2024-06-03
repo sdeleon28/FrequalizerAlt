@@ -40,6 +40,17 @@ function build_and_open_xcode_macos_lr() {
   open build/xcode-lr/frequalizer.xcodeproj
 }
 
+function build_and_open_xcode_macos_prod() {
+  cmake \
+    -DJUCE_BUILD_EXTRAS=ON \
+    -DCMAKE_BUILD_TYPE:STRING=Release \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 \
+    -H"." \
+    -B"build/xcode-prod" \
+    -G Xcode
+  open build/xcode-prod/frequalizer.xcodeproj
+}
+
 function build_and_open_xcode_macos_lr_prod() {
   cmake \
     -DLR_MODE=ON \
