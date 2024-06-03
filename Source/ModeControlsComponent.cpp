@@ -18,12 +18,21 @@ ModeControlsComponent::ModeControlsComponent (
         addAndMakeVisible (button);
         button.addListener (this);
     };
+#if LR_MODE
+    setupButton (stereoButton, TRANS ("stereo"));
+    setupButton (midSideButton, TRANS ("L/R"));
+    setupButton (midButton, TRANS ("left"));
+    setupButton (sideButton, TRANS ("right"));
+    setupButton (midSoloButton, TRANS ("solo"));
+    setupButton (sideSoloButton, TRANS ("solo"));
+#else
     setupButton (stereoButton, TRANS ("stereo"));
     setupButton (midSideButton, TRANS ("mid/side"));
     setupButton (midButton, TRANS ("mid"));
     setupButton (sideButton, TRANS ("side"));
     setupButton (midSoloButton, TRANS ("solo"));
     setupButton (sideSoloButton, TRANS ("solo"));
+#endif
     updateCurrentMode();
 }
 
@@ -93,7 +102,7 @@ float ModeControlsComponent::stringStateToParamValue (const String& stateString,
 }
 
 void ModeControlsComponent::parameterChanged (const String& parameterID,
-                                              float newValue)
+                                              float /* newValue */)
 {
     if (parameterID != "mode")
         return;

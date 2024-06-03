@@ -91,7 +91,8 @@
     [X] Mode controls
     [X] Visible bands
     [X] Visible plots
-[ ] Add compiler flag to turn it into an L/R EQ
+[X] Add compiler flag to turn it into an L/R EQ
+[X] Fix mid/side bullshit encoding/decoding
 [ ] Add separate output controls for mid and side
 [ ] Metering
     [ ] Input

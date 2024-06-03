@@ -8,10 +8,8 @@ function print_usage() {
   echo "  ./frequalizer.sh [
       |macos: Build and open Xcode
       |macos-prod: Build and open Xcode in release mode
-      |config-ninja: Configure Ninja
-      |ninja: Build with Ninja
-      |config-ninja-prod: Configure Ninja in release mode
-      |ninja-prod: Build with Ninja in release mode
+      |macos-lr: Build and open Xcode
+      |macos-lr-prod: Build and open Xcode in release mode
       |lsp: Configure LSP
       |options: Print options
       |i: Iteractive with fzf
@@ -30,46 +28,28 @@ function build_and_open_xcode_macos() {
   open build/xcode/frequalizer.xcodeproj
 }
 
-function build_and_open_xcode_macos_prod() {
+function build_and_open_xcode_macos_lr() {
   cmake \
+    -DLR_MODE=ON \
+    -DJUCE_BUILD_EXTRAS=ON \
+    -DCMAKE_BUILD_TYPE:STRING=Debug \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 \
+    -H"." \
+    -B"build/xcode-lr" \
+    -G Xcode
+  open build/xcode-lr/frequalizer.xcodeproj
+}
+
+function build_and_open_xcode_macos_lr_prod() {
+  cmake \
+    -DLR_MODE=ON \
     -DJUCE_BUILD_EXTRAS=ON \
     -DCMAKE_BUILD_TYPE:STRING=Release \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 \
     -H"." \
-    -B"build/xcode-prod" \
+    -B"build/xcode-lr-prod" \
     -G Xcode
-  open build/xcode-prod/frequalizer.xcodeproj
-}
-
-function configure_ninja() {
-  cmake \
-    -DJUCE_BUILD_EXTRAS=ON \
-    -DCMAKE_BUILD_TYPE:STRING=Debug \
-    -H"." \
-    -B"build/ninja" \
-    -G Ninja
-}
-
-function build_ninja() {
-  cmake --build build/ninja --target frequalizer
-  # Make sure it gets copied
-  echo "+++ Copying VST3 to /Library/Audio/Plug-Ins/VST3"
-  cp -r "build/ninja/frequalizer_artefacts/Debug/VST3/Frequalizer Alt.vst3" "/Library/Audio/Plug-Ins/VST3/Frequalizer Alt.vst3"
-}
-
-function configure_ninja_prod() {
-  cmake \
-    -DJUCE_BUILD_EXTRAS=ON \
-    -DCMAKE_BUILD_TYPE:STRING=Release \
-    -H"." \
-    -B"build/ninja" \
-    -G Ninja
-}
-
-function build_ninja_prod() {
-  cmake --build build/ninja --target frequalizer
-  echo "+++ Copying VST3 to /Library/Audio/Plug-Ins/VST3"
-  cp -r "build/ninja/frequalizer_artefacts/Release/VST3/Frequalizer Alt.vst3" "/Library/Audio/Plug-Ins/VST3/Frequalizer Alt.vst3"
+  open build/xcode-lr-prod/frequalizer.xcodeproj
 }
 
 function configure_lsp() {
@@ -92,10 +72,6 @@ function configure_lsp() {
 function print_options() {
   echo macos
   echo macos-prod
-  echo config-ninja
-  echo ninja
-  echo config-ninja-prod
-  echo ninja-prod
   echo lsp
   echo options
   echo help
@@ -114,17 +90,11 @@ case $1 in
   macos-prod)
     build_and_open_xcode_macos_prod
     ;;
-  config-ninja)
-    configure_ninja
+  macos-lr)
+    build_and_open_xcode_macos_lr
     ;;
-  ninja)
-    build_ninja
-    ;;
-  config-ninja-prod)
-    configure_ninja_prod
-    ;;
-  ninja-prod)
-    build_ninja_prod
+  macos-lr-prod)
+    build_and_open_xcode_macos_lr_prod
     ;;
   lsp)
     configure_lsp

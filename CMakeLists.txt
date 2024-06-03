@@ -18,12 +18,21 @@ if (APPLE)
     list(APPEND FORMATS "AU")
 endif()
 
+option(LR_MODE "Enable LR_MODE macro" OFF)
+if (LR_MODE)
+    set(PLUGIN_NAME "Frequalizer L/R")
+    set(PLUGIN_CODE "FqLR")
+else()
+    set(PLUGIN_NAME "Frequalizer Alt")
+    set(PLUGIN_CODE "FqMS")
+endif()
+
 # add the plugin targets
 juce_add_plugin(frequalizer
                 VERSION "1.1.0"
                 COMPANY_NAME "foleysfinest"
                 PLUGIN_MANUFACTURER_CODE "FFAU"
-                PLUGIN_CODE "FqOS"
+                PLUGIN_CODE "${PLUGIN_CODE}"
                 FORMATS ${FORMATS}
                 VST3_CATEGORIES "Fx" "Analyzer" "EQ"
                 AAX_CATEGORY "AAX_ePlugInCategory_EQ"
@@ -32,8 +41,8 @@ juce_add_plugin(frequalizer
                 COMPANY_WEBSITE "https://foleysfinest.com"
                 COMPANY_EMAIL "info@foleysfinest.com"
                 BUNDLE_ID "com.foleysfinest.frequalizer"
-                PLUGIN_NAME "Frequalizer Alt"
-                PRODUCT_NAME "Frequalizer Alt")
+                PLUGIN_NAME "${PLUGIN_NAME}"
+                PRODUCT_NAME "${PLUGIN_NAME}")
 
 # add the sources
 add_subdirectory(Resources)
@@ -48,6 +57,9 @@ target_compile_definitions(frequalizer
     JUCE_DISABLE_ASSERTIONS=1
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_WEB_BROWSER=0)
+if (LR_MODE)
+  target_compile_definitions(frequalizer PUBLIC LR_MODE=1)
+endif()
 
 # setup the copying to the output folder
 if (APPLE)

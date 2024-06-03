@@ -49,6 +49,23 @@ void ModeIndicator::updateUi()
 {
     switch (currentMode)
     {
+#if LR_MODE
+        case PluginMode::Stereo:
+            modeLabel.setText (TRANS ("stereo"), dontSendNotification);
+            break;
+        case PluginMode::Mid:
+            modeLabel.setText (TRANS ("left"), dontSendNotification);
+            break;
+        case PluginMode::Side:
+            modeLabel.setText (TRANS ("right"), dontSendNotification);
+            break;
+        case PluginMode::MidSolo:
+            modeLabel.setText (TRANS ("left (solo)"), dontSendNotification);
+            break;
+        case PluginMode::SideSolo:
+            modeLabel.setText (TRANS ("right (solo)"), dontSendNotification);
+            break;
+#else
         case PluginMode::Stereo:
             modeLabel.setText (TRANS ("stereo"), dontSendNotification);
             break;
@@ -64,6 +81,7 @@ void ModeIndicator::updateUi()
         case PluginMode::SideSolo:
             modeLabel.setText (TRANS ("side (solo)"), dontSendNotification);
             break;
+#endif
     }
     repaint();
 }

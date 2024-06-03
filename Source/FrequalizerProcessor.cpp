@@ -114,10 +114,17 @@ std::vector<FrequalizerAudioProcessor::Band> createDefaultBands()
     for (auto mode : filterModes)
     {
         String suffix = "";
+#if LR_MODE
+        if (mode == FrequalizerAudioProcessor::FilterMode::Mid)
+            suffix = " (L)";
+        else if (mode == FrequalizerAudioProcessor::FilterMode::Side)
+            suffix = " (R)";
+#else
         if (mode == FrequalizerAudioProcessor::FilterMode::Mid)
             suffix = " (M)";
         else if (mode == FrequalizerAudioProcessor::FilterMode::Side)
             suffix = " (S)";
+#endif
 
         defaults.push_back (FrequalizerAudioProcessor::Band (
             TRANS ("Lowest" + suffix),
@@ -503,11 +510,21 @@ void FrequalizerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         std::vector<float> midChannel (numSamples);
         std::vector<float> sideChannel (numSamples);
 
+#if LR_MODE
+        // Purposefully inefficient to make the rest of the code the same
         for (size_t i = 0; i < numSamples; ++i)
         {
-            midChannel[i] = (leftChannel[i] + rightChannel[i]) / 2.0f;
-            sideChannel[i] = (rightChannel[i] - leftChannel[i]) / 3.0f;
+            midChannel[i] = leftChannel[i];
+            sideChannel[i] = rightChannel[i];
         }
+#else
+        // Encode stereo to mid/side
+        for (size_t i = 0; i < numSamples; ++i)
+        {
+            midChannel[i] = (leftChannel[i] + rightChannel[i]) * 0.5f;
+            sideChannel[i] = (leftChannel[i] - rightChannel[i]) * 0.5f;
+        }
+#endif
 
         float* midChannelPtr = midChannel.data();
         float* sideChannelPtr = sideChannel.data();
@@ -542,12 +559,21 @@ void FrequalizerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                 midChannel[j] = 0.0f;
         }
 
+#if LR_MODE
+        // And unwrap the hack from the previous hash else
+        for (size_t i = 0; i < numSamples; ++i)
+        {
+            leftChannel[i] = midChannel[i];
+            rightChannel[i] = sideChannel[i];
+        }
+#else
         // Decode mid/side back to stereo
         for (size_t i = 0; i < numSamples; ++i)
         {
-            leftChannel[i] = midChannel[i] - sideChannel[i];
-            rightChannel[i] = midChannel[i] + sideChannel[i];
+            leftChannel[i] = midChannel[i] + sideChannel[i];
+            rightChannel[i] = midChannel[i] - sideChannel[i];
         }
+#endif
     }
 
     auto outputGainBlock =
