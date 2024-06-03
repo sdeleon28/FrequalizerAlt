@@ -94,6 +94,7 @@
 [X] Add compiler flag to turn it into an L/R EQ
 [X] Fix mid/side bullshit encoding/decoding
 [X] Add separate output controls for mid and side
+[-] Make all bands inactive by default
 [ ] Metering
     [ ] Input
     [ ] Output
