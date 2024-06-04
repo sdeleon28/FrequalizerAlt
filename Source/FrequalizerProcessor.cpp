@@ -817,12 +817,12 @@ void FrequalizerAudioProcessor::updateBypassedStates()
         midFilter.setBypassed<4> (! bands[10].active);
         midFilter.setBypassed<5> (! bands[11].active);
 
-        midFilter.setBypassed<0> (! bands[12].active);
-        midFilter.setBypassed<1> (! bands[13].active);
-        midFilter.setBypassed<2> (! bands[14].active);
-        midFilter.setBypassed<3> (! bands[15].active);
-        midFilter.setBypassed<4> (! bands[16].active);
-        midFilter.setBypassed<5> (! bands[17].active);
+        sideFilter.setBypassed<0> (! bands[12].active);
+        sideFilter.setBypassed<1> (! bands[13].active);
+        sideFilter.setBypassed<2> (! bands[14].active);
+        sideFilter.setBypassed<3> (! bands[15].active);
+        sideFilter.setBypassed<4> (! bands[16].active);
+        sideFilter.setBypassed<5> (! bands[17].active);
     }
     for (size_t i = 0; i < bands.size(); ++i)
         bands[i].soloed = i == size_t (soloed);
