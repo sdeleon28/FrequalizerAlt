@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.13.0)
 project(frequalizer VERSION 1.1.0)
 add_subdirectory(External/JUCE)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 # check which formats we want to build
 set(FORMATS "VST3")
 if (AAX_PATH)
