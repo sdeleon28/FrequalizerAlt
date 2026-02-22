@@ -147,7 +147,7 @@ public:
               float frequencyToUse,
               float qualityToUse,
               float gainToUse = 1.0f,
-              bool shouldBeActive = true,
+              bool shouldBeActive = false,
               bool shouldBeSoloed = false)
             : name (nameToUse),
               mode (modeToUse),

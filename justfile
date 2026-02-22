@@ -78,8 +78,23 @@ clean:
 clean-all:
     rm -rf build
 
-# Full rebuild from scratch
-rebuild: clean configure build
+# Deploy built plugins to system plugin folders
+deploy:
+    cp -R {{build_dir}}/frequalizer_artefacts/Debug/VST3/Frequalizer*.vst3 ~/Library/Audio/Plug-Ins/VST3/
+    cp -R {{build_dir}}/frequalizer_artefacts/Debug/AU/Frequalizer*.component ~/Library/Audio/Plug-Ins/Components/
+    @echo "Deployed to ~/Library/Audio/Plug-Ins/"
+
+# Deploy release artifacts to system plugin folders
+deploy-release:
+    cp -R {{build_dir}}/frequalizer_artefacts/Release/VST3/Frequalizer*.vst3 ~/Library/Audio/Plug-Ins/VST3/
+    cp -R {{build_dir}}/frequalizer_artefacts/Release/AU/Frequalizer*.component ~/Library/Audio/Plug-Ins/Components/
+    @echo "Deployed release build to ~/Library/Audio/Plug-Ins/"
+
+# Build and deploy plugins
+build-and-deploy: build deploy
+
+# Full rebuild from scratch (clean + configure + build + deploy)
+rebuild: clean configure build deploy
 
 # Show build errors only (useful for agents)
 check: _ensure-configured
