@@ -183,7 +183,7 @@ public:
         float frequency = 1000.0f;
         float quality = 1.0f;
         float gain = 1.0f;
-        bool active = true;
+        bool active = false;
         std::vector<double> magnitudes;
         bool soloed = false;
 
