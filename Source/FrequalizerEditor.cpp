@@ -366,15 +366,27 @@ void FrequalizerAudioProcessorEditor::parameterChanged (
 {
     if (parameter == FrequalizerAudioProcessor::paramFullscreen)
     {
-        isFullscreen = newValue > 0.5f;
-        updateActiveMode();
-        resized();
-        repaint();
+        juce::Component::SafePointer<FrequalizerAudioProcessorEditor> safeThis (this);
+        juce::MessageManager::callAsync ([safeThis, newValue]
+        {
+            if (safeThis == nullptr)
+                return;
+            safeThis->isFullscreen = newValue > 0.5f;
+            safeThis->updateActiveMode();
+            safeThis->resized();
+            safeThis->repaint();
+        });
         return;
     }
     if (parameter != FrequalizerAudioProcessor::paramMode)
         return;
-    updateActiveMode();
+    juce::Component::SafePointer<FrequalizerAudioProcessorEditor> safeThis (this);
+    juce::MessageManager::callAsync ([safeThis]
+    {
+        if (safeThis == nullptr)
+            return;
+        safeThis->updateActiveMode();
+    });
 }
 
 void FrequalizerAudioProcessorEditor::changeListenerCallback (

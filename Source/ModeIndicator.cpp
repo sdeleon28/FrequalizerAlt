@@ -29,7 +29,13 @@ void ModeIndicator::parameterChanged (const String& parameterID, float /* newVal
 {
     if (parameterID != "mode")
         return;
-    updateCurrentMode();
+    juce::Component::SafePointer<ModeIndicator> safeThis (this);
+    juce::MessageManager::callAsync ([safeThis]
+    {
+        if (safeThis == nullptr)
+            return;
+        safeThis->updateCurrentMode();
+    });
 }
 
 void ModeIndicator::paint (Graphics& g)

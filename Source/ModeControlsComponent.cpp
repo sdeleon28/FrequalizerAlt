@@ -106,7 +106,13 @@ void ModeControlsComponent::parameterChanged (const String& parameterID,
 {
     if (parameterID != "mode")
         return;
-    updateCurrentMode();
+    juce::Component::SafePointer<ModeControlsComponent> safeThis (this);
+    juce::MessageManager::callAsync ([safeThis]
+    {
+        if (safeThis == nullptr)
+            return;
+        safeThis->updateCurrentMode();
+    });
 }
 
 void ModeControlsComponent::updateUi()

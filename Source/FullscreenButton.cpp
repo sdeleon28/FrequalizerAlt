@@ -42,8 +42,14 @@ void FullscreenButton::parameterChanged (const String& parameterID,
 {
     if (parameterID != "fullscreen")
         return;
-    isFullscreen = newValue >= 0.5f;
-    repaint();
+    juce::Component::SafePointer<FullscreenButton> safeThis (this);
+    juce::MessageManager::callAsync ([safeThis, newValue]
+    {
+        if (safeThis == nullptr)
+            return;
+        safeThis->isFullscreen = newValue >= 0.5f;
+        safeThis->repaint();
+    });
 }
 
 void FullscreenButton::mouseUp (const MouseEvent& event)
